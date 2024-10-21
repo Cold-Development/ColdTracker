@@ -26,6 +26,7 @@ public class ReloadCommand extends BaseCommand {
             return;
         }
 
+        plugin.reloadConfig();
         plugin.reload();
         plugin.getManager(LocaleManager.class).sendMessage(sender, "command-reload-success");
     }
