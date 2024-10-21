@@ -66,6 +66,17 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Maven Jar Plugin for custom JAR name -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <finalName>ColdTracker-${project.version}</finalName>
+                </configuration>
+            </plugin>
+
         </plugins>
         <resources>
             <resource>
