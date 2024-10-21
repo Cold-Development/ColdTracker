@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: ❓ Support Question
-    url: https://github.com/Cold-Development/MoneyPouchDeluxe/discussions
+    url: https://github.com/Cold-Development/ColdTracker/discussions
     about: Use GitHub discussions feature for questions
   - name: 👾 Discord server
     url: https://discord.colddev.dev
