@@ -24,7 +24,8 @@ public class CommandManager extends Manager {
         SHOWTIME,
         RELOAD,
         WIPE,
-        VERSION;
+        VERSION,
+        HELP;
 
         private List<String> aliases;
 

@@ -18,10 +18,12 @@ public class Commander extends CommandHandler {
         super(plugin, "coldtracker", CommandManager.CommandAliases.ROOT);
 
         // Register commands.
-        this.registerCommand(new ShowTimeCommand());
+        this.registerCommand(new HelpCommand(this));
         this.registerCommand(new ReloadCommand());
-        this.registerCommand(new VersionCommand());
         this.registerCommand(new WipeCommand());
+        this.registerCommand(new VersionCommand());
+        this.registerCommand(new ShowTimeCommand());
+
     }
 
     @Override
@@ -50,8 +52,10 @@ public class Commander extends CommandHandler {
         }
     }
 
+
     @Override
     public void unknownCommand(CommandSender sender, String[] args) {
         this.plugin.getManager(LocaleManager.class).sendMessage(sender, "unknown-command", StringPlaceholders.of("input", args[0]));
     }
+
 }

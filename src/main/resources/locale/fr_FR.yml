@@ -1,0 +1,36 @@
+# Plugin prefix
+prefix: '&8「&#635AA7C&#7D72B7o&#978BC7l&#B2A3D8d&#CCBCE8T&#E6D4F8r&#D8B8F8a&#C99CF7c&#BB80F7k&#AC64F6e&#9E48F6r&8」&7» '
+
+# Help Command
+command-help-description: '&8 - &c/coldtracker help &7- Affiche le menu d''aide... Vous êtes arrivé'
+command-help-title: '&cCommandes disponibles :'
+
+# Misc
+no-permission: '&cVous n''avez pas la permission pour cela !'
+unknown-command: '&cCommande inconnue &4%input%&c.'
+invalid-command-usage: '&cUsage incorrect de la commande.'
+player-not-found: '&7Le joueur n''a pas pu être trouvé : &c{player}&7.'
+
+# Showtime Command Message
+command-showtime-description: '&8 - &c/coldtracker showtime <nomdujoueur> &7- Affiche le temps total joué par le joueur'
+no-staff-member: '&7&c{player} &7n''est pas un membre du staff.'
+showtime-message: '&c{player} &7a joué pendant &c{time}&7.'
+command-showtime-usage: '&7Usage : &c/coldtracker showtime <nomdujoueur>'
+
+# Database message warnings
+command-wipe-description: '&8 - &c/coldtracker wipe &7- Réinitialise la base de données SQLite actuelle'
+command-wipe-usage: '&7Usage : &c/coldtracker wipe'
+command-wipe-warning: '&eATTENTION : &cCette opération supprimera toutes les données de la base de données active. &cSi vous êtes sûr de cela, utilisez &a/coldtracker wipe confirm&c.'
+command-wipe-success: '&7Toutes les données de la base de données ont été effacées avec &asuccès&7.'
+
+# Base Command Message
+base-command-color: '&7'
+base-command-help: '&7Utilisez &c/coldtracker help &7pour des informations sur les commandes.'
+
+# Reload Command
+command-reload-description: '&8 - &c/coldtracker reload &7- Recharge le plugin'
+command-reload-usage: '&7Usage : &c/coldtracker reload'
+command-reload-success: '&7Les fichiers de configuration et de locale ont été rechargés.'
+
+# Version Command
+command-version-description: '&8 - &c/coldtracker version &7- Affiche les informations de version pour ColdTracker'

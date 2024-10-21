@@ -1,0 +1,36 @@
+# Plugin prefix
+prefix: '&8「&#635AA7C&#7D72B7o&#978BC7l&#B2A3D8d&#CCBCE8T&#E6D4F8r&#D8B8F8a&#C99CF7c&#BB80F7k&#AC64F6e&#9E48F6r&8」&7» '
+
+# Help Command
+command-help-description: '&8 - &c/coldtracker help &7- Afișează meniul de ajutor... Ai ajuns'
+command-help-title: '&cComenzi disponibile:'
+
+# Misc
+no-permission: '&cNu ai permisiunea pentru a face asta!'
+unknown-command: '&cComandă necunoscută &4%input%&c.'
+invalid-command-usage: '&cUtilizare greșită a comenzii.'
+player-not-found: '&7Jucătorul nu a putut fi găsit: &c{player}&7.'
+
+# Showtime Command Message
+command-showtime-description: '&8 - &c/coldtracker showtime <numejucator> &7- Afișează timpul total jucat de jucător'
+no-staff-member: '&7&c{player} &7nu este membru al staffului.'
+showtime-message: '&c{player} &7a jucat timp de &c{time}&7.'
+command-showtime-usage: '&7Utilizare: &c/coldtracker showtime <numejucator>'
+
+# Database message warnings
+command-wipe-description: '&8 - &c/coldtracker wipe &7- Șterge baza de date SQLite activă'
+command-wipe-usage: '&7Utilizare: &c/coldtracker wipe'
+command-wipe-warning: '&eAVERTISMENT: &cAceastă operațiune va șterge toate datele din baza de date activă. &cDacă ești sigur, folosește &a/coldtracker wipe confirm&c.'
+command-wipe-success: '&7Toate datele din baza de date au fost șterse cu &asucces&7.'
+
+# Base Command Message
+base-command-color: '&7'
+base-command-help: '&7Folosește &c/coldtracker help &7pentru informații despre comenzi.'
+
+# Reload Command
+command-reload-description: '&8 - &c/coldtracker reload &7- Reîncarcă pluginul'
+command-reload-usage: '&7Utilizare: &c/coldtracker reload'
+command-reload-success: '&7Fișierele de configurare și localizare au fost reîncărcate.'
+
+# Version Command
+command-version-description: '&8 - &c/coldtracker version &7- Afișează informațiile despre versiunea ColdTracker'

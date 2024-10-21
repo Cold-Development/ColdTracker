@@ -1,20 +1,36 @@
 # Plugin prefix
 prefix: '&8「&#635AA7C&#7D72B7o&#978BC7l&#B2A3D8d&#CCBCE8T&#E6D4F8r&#D8B8F8a&#C99CF7c&#BB80F7k&#AC64F6e&#9E48F6r&8」&7» '
 
-# Messages
-no-permission: '&cYou don''t have permission for that!'
-invalid-command-usage: '&cInvalid command usage.'
-player-not-found: '&7Player &c{player}&7 could not be found.'
-unknown-command: '&cUnknown command &4%input%&c.'
-command-reload-success: '&7Configuration and locale files were reloaded.'
+# Help Command
+command-help-description: '&8 - &c/coldtracker help &7- Displays the help menu... You have arrived'
+command-help-title: '&cAvailable Commands:'
 
 # Misc
+no-permission: '&cYou don''t have permission for that!'
+unknown-command: '&cUnknown command &4%input%&c.'
+invalid-command-usage: '&cInvalid command usage.'
+player-not-found: '&7Player could not be found: &c{player}&7.'
+
+# Showtime Command Message
+command-showtime-description: '&8 - &c/coldtracker showtime <playername> &7- Show player''s total time tracked'
 no-staff-member: '&7&c{player} &7is not a staff member.'
 showtime-message: '&c{player} &7has played for &c{time}&7.'
+command-showtime-usage: '&7Usage: &c/coldtracker showtime <playername>'
 
 # Database message warnings
+command-wipe-description: '&8 - &c/coldtracker wipe &7- Wipe current SQLite database'
+command-wipe-usage: '&7Usage: &c/coldtracker wipe'
 command-wipe-warning: '&eWARNING: &cThis operation will delete all data from the active database. &cIf you are absolutely sure about this, use &a/coldtracker wipe confirm&c.'
 command-wipe-success: '&7All data from the database has been wiped &asuccessfully&7.'
 
 # Base Command Message
 base-command-color: '&7'
+base-command-help: '&7Use &c/coldtracker help &7for command information.'
+
+# Reload Command
+command-reload-description: '&8 - &c/coldtracker reload &7- Reloads the plugin'
+command-reload-usage: '&7Usage: &c/coldtracker reload'
+command-reload-success: '&7Configuration and locale files were reloaded.'
+
+# Version Command
+command-version-description: '&8 - &c/coldtracker version &7- Display the version info for ColdTracker'

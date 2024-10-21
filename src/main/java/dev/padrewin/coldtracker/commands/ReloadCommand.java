@@ -20,8 +20,13 @@ public class ReloadCommand extends BaseCommand {
             return;
         }
 
-        plugin.reloadConfig();
-        plugin.getManager(LocaleManager.class).reload();
+        // Check if there are extra arguments or incorrect usage
+        if (args.length > 0) {
+            plugin.getManager(LocaleManager.class).sendMessage(sender, "command-reload-usage");
+            return;
+        }
+
+        plugin.reload();
         plugin.getManager(LocaleManager.class).sendMessage(sender, "command-reload-success");
     }
 

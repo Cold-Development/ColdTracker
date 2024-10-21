@@ -58,6 +58,7 @@ public class VersionCommand extends BaseCommand {
             sender.sendMessage(ansiAqua + "GitHub: " + ansiRed + "https://github.com/Cold-Development/ColdTracker" + ansiReset);
         }
 
+        localeManager.sendSimpleMessage(sender, "base-command-help");
         localeManager.sendCustomMessage(sender, baseColor + "");
     }
 

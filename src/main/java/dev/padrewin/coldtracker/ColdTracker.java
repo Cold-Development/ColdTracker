@@ -13,12 +13,10 @@ import dev.padrewin.coldtracker.manager.LocaleManager;
 import dev.padrewin.coldtracker.setting.SettingKey;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import static dev.padrewin.colddev.manager.AbstractDataManager.*;
 
 import java.io.File;
 import java.util.List;
-
-import static dev.padrewin.colddev.manager.AbstractDataManager.*;
-import static dev.padrewin.colddev.manager.AbstractDataManager.ANSI_RESET;
 
 public final class ColdTracker extends ColdPlugin {
 
@@ -132,10 +130,10 @@ public final class ColdTracker extends ColdPlugin {
         RegisteredServiceProvider<LuckPerms> provider = getServer().getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {
             luckPerms = provider.getProvider();
-            getLogger().info(ANSI_LIGHT_BLUE + "LuckPerms API loaded successfully. " + ANSI_BOLD + ANSI_GREEN + "✓" + ANSI_RESET);
+            getLogger().info(ANSI_LIGHT_BLUE + "LuckPerms API loaded successfully. " + ANSI_BOLD + ANSI_GREEN + "✔" + ANSI_RESET);
 
         } else {
-            getLogger().warning("LuckPerms API not found.");
+            getLogger().warning(ANSI_LIGHT_BLUE + "LuckPerms API not found. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
         }
     }
 

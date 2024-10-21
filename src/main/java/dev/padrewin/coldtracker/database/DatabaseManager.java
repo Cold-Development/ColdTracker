@@ -33,9 +33,9 @@ public class DatabaseManager {
 
             String dbPath = dataFolder.getAbsolutePath() + File.separator + "coldtracker.db";
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
-            plugin.getLogger().info(ANSI_LIGHT_BLUE + "Database connected using SQLite. " + ANSI_BOLD + ANSI_GREEN + "✓" + ANSI_RESET);
+            plugin.getLogger().info(ANSI_LIGHT_BLUE + "Database connected using SQLite. " + ANSI_BOLD + ANSI_GREEN + "✔" + ANSI_RESET);
         } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to initialize the database!");
+            plugin.getLogger().warning(ANSI_RED + "Database failed to connect. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
             e.printStackTrace();
         }
     }

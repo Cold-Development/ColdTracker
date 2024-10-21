@@ -18,19 +18,21 @@ public class WipeCommand extends BaseCommand {
     public void execute(@NotNull ColdTracker plugin, @NotNull CommandSender sender, @NotNull String[] args) {
         LocaleManager localeManager = plugin.getManager(LocaleManager.class);
 
-        // Verifică permisiunea
         if (!sender.hasPermission("coldtracker.wipe")) {
             localeManager.sendMessage(sender, "no-permission");
             return;
         }
 
-        // Verifică dacă argumentul "confirm" este furnizat
-        if (args.length < 1 || !args[0].equalsIgnoreCase("confirm")) {
+        if (args.length == 0) {
             localeManager.sendMessage(sender, "command-wipe-warning");
             return;
         }
 
-        // Execută comanda de wipe
+        if (!args[0].equalsIgnoreCase("confirm") || args.length > 1) {
+            localeManager.sendMessage(sender, "command-wipe-usage");
+            return;
+        }
+
         plugin.getDatabaseManager().wipeDatabaseTables();
         localeManager.sendMessage(sender, "command-wipe-success");
     }
