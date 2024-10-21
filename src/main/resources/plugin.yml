@@ -1,0 +1,56 @@
+name: ColdTracker
+version: '@version@'
+main: dev.padrewin.coldtracker.ColdTracker
+api-version: '1.20'
+authors: [ padrewin ]
+depend: [LuckPerms]
+
+commands:
+  coldtracker:
+    description: "Displays version information about ColdTracker."
+    usage: "/coldtracker"
+    permission: "coldtracker.version"
+
+  reload:
+    description: "Reloads the ColdTracker plugin configuration."
+    usage: "/coldtracker reload"
+    permission: "coldtracker.reload"
+
+  showtime:
+    description: "Displays the total time played by a specified player."
+    usage: "/coldtracker showtime <playername>"
+    permission: "coldtracker.showtime"
+
+  wipe:
+    description: "Wipes all data from the database."
+    usage: "/coldtracker wipe"
+    permission: "coldtracker.wipe"
+
+permissions:
+  coldtracker.*:
+    description: "Gives access to all ColdTracker commands."
+    children:
+      coldtracker.version: true
+      coldtracker.showtime: true
+      coldtracker.reload: true
+      coldtracker.wipe: true
+
+  coldtracker.version:
+    description: "Allows the use of the /coldtracker command to view version information."
+    default: true
+
+  coldtracker.showtime:
+    description: "Allows the use of the /coldtracker showtime command."
+    default: op
+
+  coldtracker.reload:
+    description: "Allows the use of the /coldtracker reload command."
+    default: op
+
+  coldtracker.wipe:
+    description: "Allows the use of the /coldtracker wipe command."
+    default: op
+
+  coldtracker.tracktime:
+    description: "Allows tracking of player join and leave times."
+    default: op
