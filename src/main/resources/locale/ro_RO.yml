@@ -6,19 +6,19 @@ command-help-description: '&8 - &c/coldtracker help &7- Afișează meniul de aju
 command-help-title: '&cComenzi disponibile:'
 
 # Misc
-no-permission: '&cNu ai permisiunea pentru a face asta!'
+no-permission: '&cNu ai permisiune pentru asta!'
 unknown-command: '&cComandă necunoscută &4%input%&c.'
-invalid-command-usage: '&cUtilizare greșită a comenzii.'
-player-not-found: '&7Jucătorul nu a putut fi găsit: &c{player}&7.'
+invalid-command-usage: '&cUtilizare invalidă a comenzii.'
+player-not-found: '&7Jucătorul nu a fost găsit: &c{player}&7.'
 
 # Showtime Command Message
-command-showtime-description: '&8 - &c/coldtracker showtime <numejucator> &7- Afișează timpul total jucat de jucător'
-no-staff-member: '&7&c{player} &7nu este membru al staffului.'
+command-showtime-description: '&8 - &c/coldtracker showtime <numejucător> &7- Afișează timpul total urmărit al jucătorului'
+no-staff-member: '&7&c{player} &7nu este membru al staff-ului.'
 showtime-message: '&c{player} &7a jucat timp de &c{time}&7.'
-command-showtime-usage: '&7Utilizare: &c/coldtracker showtime <numejucator>'
+command-showtime-usage: '&7Utilizare: &c/coldtracker showtime <numejucător>'
 
 # Database message warnings
-command-wipe-description: '&8 - &c/coldtracker wipe &7- Șterge baza de date SQLite activă'
+command-wipe-description: '&8 - &c/coldtracker wipe &7- Șterge baza de date SQLite curentă'
 command-wipe-usage: '&7Utilizare: &c/coldtracker wipe'
 command-wipe-warning: '&eAVERTISMENT: &cAceastă operațiune va șterge toate datele din baza de date activă. &cDacă ești sigur, folosește &a/coldtracker wipe confirm&c.'
 command-wipe-success: '&7Toate datele din baza de date au fost șterse cu &asucces&7.'
@@ -31,6 +31,14 @@ base-command-help: '&7Folosește &c/coldtracker help &7pentru informații despre
 command-reload-description: '&8 - &c/coldtracker reload &7- Reîncarcă pluginul'
 command-reload-usage: '&7Utilizare: &c/coldtracker reload'
 command-reload-success: '&7Fișierele de configurare și localizare au fost reîncărcate.'
+
+# Dump Command
+command-dump-disabled: '&7Dump Gist &cdezactivat&7. Vă rugăm să consultați fișierul de configurare.'
+command-dump-description: '&8 - &c/coldtracker dump &7- Exportă datele din baza de date curentă în Gist'
+command-dump-usage: '&7Utilizare: &c/coldtracker dump'
+command-dump-warning: '&eAVERTISMENT: &cAceastă operațiune va exporta datele din baza de date curentă. Folosiți &a/coldtracker dump confirm&c pentru a continua.'
+command-dump-success: '&7Exportarea bazei de date a fost realizată cu &asucces&7! Link: &a{link}'
+command-dump-fail: '&cEroare la generarea linkului Gist. Verificați consola pentru erori.'
 
 # Version Command
 command-version-description: '&8 - &c/coldtracker version &7- Afișează informațiile despre versiunea ColdTracker'

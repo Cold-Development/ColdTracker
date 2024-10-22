@@ -32,5 +32,13 @@ command-reload-description: '&8 - &c/coldtracker reload &7- Reloads the plugin'
 command-reload-usage: '&7Usage: &c/coldtracker reload'
 command-reload-success: '&7Configuration and locale files were reloaded.'
 
+# Dump Command
+command-dump-disabled: '&7Dump Gist &cdisabled&7. Please consult configuration file.'
+command-dump-description: '&8 - &c/coldtracker dump &7- Dump data from current database in Gist'
+command-dump-usage: '&7Usage: &c/coldtracker dump'
+command-dump-warning: '&eWARNING: &cThis operation will dump the data from the current database. Use &a/coldtracker dump confirm&c to proceed.'
+command-dump-success: '&7Database dump &asuccessful&7! Link: &a{link}'
+command-dump-fail: '&cFailed to generate Gist link. Check console for any errors.'
+
 # Version Command
 command-version-description: '&8 - &c/coldtracker version &7- Display the version info for ColdTracker'

@@ -3,34 +3,42 @@ prefix: '&8「&#635AA7C&#7D72B7o&#978BC7l&#B2A3D8d&#CCBCE8T&#E6D4F8r&#D8B8F8a&#C
 
 # Help Command
 command-help-description: '&8 - &c/coldtracker help &7- Affiche le menu d''aide... Vous êtes arrivé'
-command-help-title: '&cCommandes disponibles :'
+command-help-title: '&cCommandes disponibles:'
 
 # Misc
 no-permission: '&cVous n''avez pas la permission pour cela !'
 unknown-command: '&cCommande inconnue &4%input%&c.'
-invalid-command-usage: '&cUsage incorrect de la commande.'
+invalid-command-usage: '&cUtilisation incorrecte de la commande.'
 player-not-found: '&7Le joueur n''a pas pu être trouvé : &c{player}&7.'
 
 # Showtime Command Message
-command-showtime-description: '&8 - &c/coldtracker showtime <nomdujoueur> &7- Affiche le temps total joué par le joueur'
+command-showtime-description: '&8 - &c/coldtracker showtime <playername> &7- Affiche le temps total suivi d''un joueur'
 no-staff-member: '&7&c{player} &7n''est pas un membre du staff.'
 showtime-message: '&c{player} &7a joué pendant &c{time}&7.'
-command-showtime-usage: '&7Usage : &c/coldtracker showtime <nomdujoueur>'
+command-showtime-usage: '&7Utilisation : &c/coldtracker showtime <playername>'
 
 # Database message warnings
-command-wipe-description: '&8 - &c/coldtracker wipe &7- Réinitialise la base de données SQLite actuelle'
-command-wipe-usage: '&7Usage : &c/coldtracker wipe'
-command-wipe-warning: '&eATTENTION : &cCette opération supprimera toutes les données de la base de données active. &cSi vous êtes sûr de cela, utilisez &a/coldtracker wipe confirm&c.'
-command-wipe-success: '&7Toutes les données de la base de données ont été effacées avec &asuccès&7.'
+command-wipe-description: '&8 - &c/coldtracker wipe &7- Efface la base de données SQLite actuelle'
+command-wipe-usage: '&7Utilisation : &c/coldtracker wipe'
+command-wipe-warning: '&eAVERTISSEMENT: &cCette opération supprimera toutes les données de la base de données active. &cSi vous êtes absolument sûr, utilisez &a/coldtracker wipe confirm&c.'
+command-wipe-success: '&7Toutes les données de la base de données ont été effacées &asuccessfully&7.'
 
 # Base Command Message
 base-command-color: '&7'
-base-command-help: '&7Utilisez &c/coldtracker help &7pour des informations sur les commandes.'
+base-command-help: '&7Utilisez &c/coldtracker help &7pour obtenir des informations sur les commandes.'
 
 # Reload Command
 command-reload-description: '&8 - &c/coldtracker reload &7- Recharge le plugin'
-command-reload-usage: '&7Usage : &c/coldtracker reload'
-command-reload-success: '&7Les fichiers de configuration et de locale ont été rechargés.'
+command-reload-usage: '&7Utilisation : &c/coldtracker reload'
+command-reload-success: '&7La configuration et les fichiers de langue ont été rechargés.'
+
+# Dump Command
+command-dump-disabled: '&7Dump Gist &cdésactivé&7. Veuillez consulter le fichier de configuration.'
+command-dump-description: '&8 - &c/coldtracker dump &7- Déversement des données de la base de données actuelle dans Gist'
+command-dump-usage: '&7Utilisation : &c/coldtracker dump'
+command-dump-warning: '&eAVERTISSEMENT: &cCette opération va déverser les données de la base de données actuelle. Utilisez &a/coldtracker dump confirm&c pour continuer.'
+command-dump-success: '&7Déversement de la base de données &aréussi&7 ! Lien : &a{link}'
+command-dump-fail: '&cÉchec de la génération du lien Gist. Vérifiez la console pour les erreurs.'
 
 # Version Command
-command-version-description: '&8 - &c/coldtracker version &7- Affiche les informations de version pour ColdTracker'
+command-version-description: '&8 - &c/coldtracker version &7- Affiche les informations de version de ColdTracker'
