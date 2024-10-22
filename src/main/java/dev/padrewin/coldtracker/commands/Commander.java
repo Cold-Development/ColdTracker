@@ -23,6 +23,7 @@ public class Commander extends CommandHandler {
         this.registerCommand(new WipeCommand());
         this.registerCommand(new VersionCommand());
         this.registerCommand(new ShowTimeCommand());
+        this.registerCommand(new DumpCommand());
 
     }
 
