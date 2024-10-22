@@ -7,50 +7,46 @@ depend: [LuckPerms]
 
 commands:
   coldtracker:
-    description: "Displays version information about ColdTracker."
-    usage: "/coldtracker"
     permission: "coldtracker.version"
-
   reload:
-    description: "Reloads the ColdTracker plugin configuration."
-    usage: "/coldtracker reload"
     permission: "coldtracker.reload"
-
   showtime:
-    description: "Displays the total time played by a specified player."
-    usage: "/coldtracker showtime <playername>"
     permission: "coldtracker.showtime"
-
   wipe:
-    description: "Wipes all data from the database."
-    usage: "/coldtracker wipe"
     permission: "coldtracker.wipe"
+  dump:
+    permission: "coldtracker.dump"
 
 permissions:
   coldtracker.*:
-    description: "Gives access to all ColdTracker commands."
+    description: Root command for ColdTracker plugin
     children:
       coldtracker.version: true
       coldtracker.showtime: true
       coldtracker.reload: true
       coldtracker.wipe: true
+      coldtracker.dump: true
 
   coldtracker.version:
-    description: "Allows the use of the /coldtracker command to view version information."
+    description: Gives access to the version command
     default: true
 
   coldtracker.showtime:
-    description: "Allows the use of the /coldtracker showtime command."
+    description: Gives access to the showtime command
     default: op
 
   coldtracker.reload:
-    description: "Allows the use of the /coldtracker reload command."
+    description: Gives access to the reload command
     default: op
 
   coldtracker.wipe:
-    description: "Allows the use of the /coldtracker wipe command."
+    description: Gives access to the wipe command
+    default: op
+
+  coldtracker.dump:
+    description: Gives access to the dump command
     default: op
 
   coldtracker.tracktime:
-    description: "Allows tracking of player join and leave times."
+    description: Gives access to track the time
     default: op
