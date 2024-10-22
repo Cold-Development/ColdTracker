@@ -47,8 +47,7 @@ public class ShowTimeCommand extends BaseCommand {
 
         UUID playerUUID = targetPlayer.getUniqueId();
 
-        // Verifică permisiunea pentru un jucător offline folosind LuckPerms
-        LuckPerms luckPerms = plugin.getLuckPerms(); // Asigură-te că LuckPerms este inițializat în pluginul tău
+        LuckPerms luckPerms = plugin.getLuckPerms();
         CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
 
         userFuture.thenAccept(user -> {
@@ -61,10 +60,8 @@ public class ShowTimeCommand extends BaseCommand {
                     return;
                 }
 
-                // Continuă logica dacă jucătorul are permisiunea
-                long totalTime = plugin.getDatabaseManager().getTotalTime(playerUUID); // total_time din baza de date
+                long totalTime = plugin.getDatabaseManager().getTotalTime(playerUUID);
 
-                // Convertim totalTime din milisecunde în zile, ore, minute, secunde
                 long hours = (totalTime / 1000) / 3600;
                 long minutes = ((totalTime / 1000) % 3600) / 60;
                 long seconds = (totalTime / 1000) % 60;
@@ -86,7 +83,7 @@ public class ShowTimeCommand extends BaseCommand {
     @Override
     public List<String> tabComplete(@NotNull ColdTracker plugin, @NotNull CommandSender sender, @NotNull String[] args) {
         if (args.length == 1) {
-            return null; // Return all player names for auto-completion
+            return null;
         }
         return Collections.emptyList();
     }

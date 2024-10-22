@@ -24,7 +24,6 @@ public class HelpCommand extends BaseCommand {
         // Send header
         localeManager.sendMessage(sender, "command-help-title");
 
-        // Send command descriptions the sender has permission for
         for (NamedExecutor executor : this.commandHandler.getExecutables())
             if (executor.hasPermission(sender))
                 localeManager.sendSimpleMessage(sender, "command-" + executor.getName() + "-description");
