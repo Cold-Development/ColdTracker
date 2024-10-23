@@ -36,6 +36,7 @@ ColdTracker is compatible with Spigot and any forks of it.<br>
 > Do not grant anyone **`coldtracker.wipe`** permission since it can wipe out the plugin's database and lose all your staff tracks.<br>
 > Same applies for **`coldtracker.dump`** permission since it can dump your database information.<br>
 > Use it only when you're absolutely sure that you want to reset the progress.
+
 ---
 ## ⚙ Installation
 1. Visit [GitHub release](https://github.com/Cold-Development/ColdTracker/releases) page.
