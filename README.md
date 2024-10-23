@@ -46,6 +46,6 @@ ColdTracker is compatible with Spigot and any forks of it.<br>
 After finishing these steps, you should be able to see `~/plugins/ColdTracker` directory, which contains all files that may interest you.<br>
 > [!WARNING]
 > After installation, you might also find a new folder named `ColdDev`.<br>
-> **DO NOT** delete that. This is the structure of ColdTracker plugin.
+> **DO NOT** delete. This is the structure of ColdTracker plugin.
 
 ![](https://raw.githubusercontent.com/mayhemantt/mayhemantt/Update/svg/Bottom.svg)
