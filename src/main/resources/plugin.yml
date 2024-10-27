@@ -26,6 +26,7 @@ permissions:
       coldtracker.reload: true
       coldtracker.wipe: true
       coldtracker.dump: true
+      coldtracker.export: true
 
   coldtracker.version:
     description: Gives access to the version command
@@ -49,4 +50,8 @@ permissions:
 
   coldtracker.tracktime:
     description: Gives access to track the time
+    default: op
+
+  coldtracker.export:
+    description: Gives access to the export command
     default: op
