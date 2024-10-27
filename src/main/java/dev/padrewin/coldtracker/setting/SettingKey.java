@@ -26,7 +26,6 @@ public class SettingKey {
             Arrays.asList(
                     "##############################",
                     "# MC-1ST.RO | STAFF ACTIVITY #",
-                    "# Server: input your server  #",
                     "#    Developer @ padrewin    #",
                     "##############################"
             ),
@@ -37,6 +36,10 @@ public class SettingKey {
             "gist-header:",
             "- ''"
     );
+
+    public static final ColdSetting<String> FILE_PREFIX = create("file-prefix", STRING, "staff_activity_",
+            "The prefix for the exported gist / file.", "For example, you could set 'survival_' or 'boxpvp_' etc.");
+
 
     private static <T> ColdSetting<T> create(String key, ColdSettingSerializer<T> serializer, T defaultValue, String... comments) {
         ColdSetting<T> setting = ColdSetting.backed(ColdTracker.getInstance(), key, serializer, defaultValue, comments);
