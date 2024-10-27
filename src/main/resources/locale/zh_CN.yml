@@ -40,5 +40,11 @@ command-dump-warning: '&e警告: &c此操作将导出当前数据库中的数据
 command-dump-success: '&7数据库导出成功&7！链接: &a{link}'
 command-dump-fail: '&c生成Gist链接失败。请检查控制台中的错误。'
 
+# Export Command
+command-export-description: '&8 - &c/coldtracker export &7- 将数据导出到plugins/ColdTracker'
+command-export-warning: '&e警告: &c导出文件已存在。使用 &a/coldtracker export confirm &c覆盖。'
+command-export-success: '&7导出成功&7. 数据已保存到&aplugins/ColdTracker&7。'
+command-export-fail: '&c保存到export.yml失败。请检查控制台中的错误。'
+
 # Version Command
 command-version-description: '&8 - &c/coldtracker version &7- 显示ColdTracker版本信息'
