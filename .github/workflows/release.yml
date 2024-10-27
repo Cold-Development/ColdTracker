@@ -39,6 +39,12 @@ jobs:
                 <password>${{ secrets.NEXUS_PASSWORD }}</password>
               </server>
             </servers>
+            <repositories>
+              <repository>
+                <id>colddev-repo</id>
+                <url>https://repo.colddev.dev</url>
+              </repository>
+            </repositories>
           </settings>
           EOF
 
