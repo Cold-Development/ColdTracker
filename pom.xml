@@ -6,7 +6,7 @@
 
     <groupId>dev.padrewin</groupId>
     <artifactId>coldtracker</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
     <name>ColdTracker</name>
@@ -32,7 +32,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -88,8 +88,8 @@
 
     <repositories>
         <repository>
-            <id>com.github.coldplugin</id>
-            <url>https://maven.pkg.github.com/Cold-Development/ColdDev</url>
+            <id>colddev-repo</id>
+            <url>https://repo.colddev.dev/</url>
         </repository>
         <repository>
             <id>papermc-repo</id>
@@ -109,7 +109,7 @@
         <dependency>
             <groupId>dev.padrewin</groupId>
             <artifactId>colddev</artifactId>
-            <version>1.4.1</version>
+            <version>1.4.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
