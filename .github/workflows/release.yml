@@ -34,9 +34,9 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>com.github.coldplugin</id>
-                <username>padrewin</username>
-                <password>${{ secrets.COLDDEV_PACKAGE }}</password>
+                <id>colddev-repo</id>
+                <username>${{ secrets.NEXUS_USERNAME }}</username>
+                <password>${{ secrets.NEXUS_PASSWORD }}</password>
               </server>
             </servers>
           </settings>
@@ -71,9 +71,9 @@ jobs:
           <settings>
             <servers>
               <server>
-                <id>com.github.coldplugin</id>
-                <username>padrewin</username>
-                <password>${{ secrets.COLDDEV_PACKAGE }}</password>
+                <id>colddev-repo</id>
+                <username>${{ secrets.NEXUS_USERNAME }}</username>
+                <password>${{ secrets.NEXUS_PASSWORD }}</password>
               </server>
             </servers>
           </settings>
