@@ -2,26 +2,26 @@
 prefix: '&8「&#635AA7C&#7D72B7o&#978BC7l&#B2A3D8d&#CCBCE8T&#E6D4F8r&#D8B8F8a&#C99CF7c&#BB80F7k&#AC64F6e&#9E48F6r&8」&7» '
 
 # Help Command
-command-help-description: '&8 - &c/coldtracker help &7- Exibe o menu de ajuda... Você chegou'
-command-help-title: '&cComandos Disponíveis:'
+command-help-description: '&8 - &c/coldtracker help &7- Mostra o menu de ajuda... Chegou'
+command-help-title: '&cComandos disponíveis:'
 
 # Misc
 no-permission: '&cVocê não tem permissão para isso!'
 unknown-command: '&cComando desconhecido &4%input%&c.'
-invalid-command-usage: '&cUso incorreto do comando.'
+invalid-command-usage: '&cUso inválido do comando.'
 player-not-found: '&7Jogador não encontrado: &c{player}&7.'
 
 # Showtime Command Message
-command-showtime-description: '&8 - &c/coldtracker showtime <playername> &7- Mostra o tempo total de um jogador'
+command-showtime-description: '&8 - &c/coldtracker showtime <nomejogador> &7- Mostra o tempo total rastreado do jogador'
 no-staff-member: '&7&c{player} &7não é um membro da equipe.'
 showtime-message: '&c{player} &7jogou por &c{time}&7.'
-command-showtime-usage: '&7Uso: &c/coldtracker showtime <playername>'
+command-showtime-usage: '&7Uso: &c/coldtracker showtime <nomejogador>'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Apaga o banco de dados SQLite atual'
 command-wipe-usage: '&7Uso: &c/coldtracker wipe'
-command-wipe-warning: '&eAVISO: &cEsta operação apagará todos os dados do banco de dados ativo. &cSe tiver certeza absoluta, use &a/coldtracker wipe confirm&c.'
-command-wipe-success: '&7Todos os dados do banco de dados foram apagados &acom sucesso&7.'
+command-wipe-warning: '&eAVISO: &cEsta operação apagará todos os dados do banco de dados ativo. &cSe tiver certeza, use &a/coldtracker wipe confirm&c.'
+command-wipe-success: '&7Todos os dados do banco de dados foram apagados com &asucesso&7.'
 
 # Base Command Message
 base-command-color: '&7'
@@ -30,15 +30,21 @@ base-command-help: '&7Use &c/coldtracker help &7para informações sobre comando
 # Reload Command
 command-reload-description: '&8 - &c/coldtracker reload &7- Recarrega o plugin'
 command-reload-usage: '&7Uso: &c/coldtracker reload'
-command-reload-success: '&7Configurações e arquivos de idioma recarregados com sucesso.'
+command-reload-success: '&7Os arquivos de configuração e locale foram recarregados.'
 
 # Dump Command
 command-dump-disabled: '&7Dump Gist &cdesativado&7. Consulte o arquivo de configuração.'
-command-dump-description: '&8 - &c/coldtracker dump &7- Despeja dados do banco de dados atual no Gist'
+command-dump-description: '&8 - &c/coldtracker dump &7- Exporta dados do banco de dados atual para Gist'
 command-dump-usage: '&7Uso: &c/coldtracker dump'
-command-dump-warning: '&eAVISO: &cEsta operação despejará os dados do banco de dados atual. Use &a/coldtracker dump confirm&c para continuar.'
-command-dump-success: '&7Despejo do banco de dados &aconcluído com sucesso&7! Link: &a{link}'
+command-dump-warning: '&eAVISO: &cEsta operação exportará os dados do banco de dados atual. Use &a/coldtracker dump confirm&c para continuar.'
+command-dump-success: '&7Exportação do banco de dados com &asucesso&7! Link: &a{link}'
 command-dump-fail: '&cFalha ao gerar o link Gist. Verifique o console para erros.'
 
+# Export Command
+command-export-description: '&8 - &c/coldtracker export &7- Exporta os dados para plugins/ColdTracker'
+command-export-warning: '&eAVISO: &cO arquivo de exportação já existe. Use &a/coldtracker export confirm &cpara sobrescrever.'
+command-export-success: '&7Exportação bem sucedida&7. Os dados foram salvos em &aplugins/ColdTracker&7.'
+command-export-fail: '&cFalha ao salvar export.yml. Verifique a consola para erros.'
+
 # Version Command
-command-version-description: '&8 - &c/coldtracker version &7- Exibe as informações da versão do ColdTracker'
+command-version-description: '&8 - &c/coldtracker version &7- Exibe as informações de versão do ColdTracker'
