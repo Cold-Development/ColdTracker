@@ -40,5 +40,11 @@ command-dump-warning: '&eAVERTISMENT: &cAceastă operațiune va exporta datele d
 command-dump-success: '&7Exportarea bazei de date a fost realizată cu &asucces&7! Link: &a{link}'
 command-dump-fail: '&cEroare la generarea linkului Gist. Verificați consola pentru erori.'
 
+# Export Command
+command-export-description: '&8 - &c/coldtracker export &7- Exportă datele în plugins/ColdTracker'
+command-export-warning: '&eAVERTISMENT: &cFișierul de export există deja. Folosiți &a/coldtracker export confirm &cpentru a suprascrie.'
+command-export-success: '&7Exportarea a fost realizată cu succes&7. Datele au fost salvate în &aplugins/ColdTracker&7.'
+command-export-fail: '&cEroare la salvarea în export.yml. Verificați consola pentru erori.'
+
 # Version Command
 command-version-description: '&8 - &c/coldtracker version &7- Afișează informațiile despre versiunea ColdTracker'
