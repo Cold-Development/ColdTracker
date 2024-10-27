@@ -15,12 +15,13 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class DumpCommand extends BaseCommand {
 
@@ -54,57 +55,64 @@ public class DumpCommand extends BaseCommand {
             return;
         }
 
-        List<OfflinePlayer> playersWithPermission = Arrays.stream(Bukkit.getOfflinePlayers())
-                .filter(p -> {
-                    CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(p.getUniqueId());
-                    return userFuture.join()
-                            .getCachedData().getPermissionData().checkPermission("coldtracker.tracktime").asBoolean();
-                })
-                .collect(Collectors.toList());
-
-        StringBuilder gistContent = new StringBuilder();
-        List<String> gistHeader = plugin.getConfig().getStringList(SettingKey.GIST_HEADER.getKey());
-
-        if (gistHeader != null && !gistHeader.isEmpty()) {
-            for (String line : gistHeader) {
-                gistContent.append(line).append("\n");
-            }
-        }
-
-        gistContent.append("\n");
-
-        for (OfflinePlayer player : playersWithPermission) {
-            long totalTime = plugin.getDatabaseManager().getTotalTime(player.getUniqueId());
-            long hours = (totalTime / 1000) / 3600;
-            long minutes = ((totalTime / 1000) % 3600) / 60;
-            long seconds = (totalTime / 1000) % 60;
-
-            long days = hours / 24;
-            hours = hours % 24;
-            String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
-
-            gistContent.append(player.getName()).append(" has played for ").append(timeFormatted).append(".\n");
-        }
-
         CompletableFuture.runAsync(() -> {
+            List<OfflinePlayer> playersWithPermission = Arrays.stream(Bukkit.getOfflinePlayers())
+                    .filter(p -> {
+                        CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(p.getUniqueId());
+                        return userFuture.join()
+                                .getCachedData().getPermissionData().checkPermission("coldtracker.tracktime").asBoolean();
+                    })
+                    .toList();
+
+            StringBuilder gistContent = new StringBuilder();
+            List<String> gistHeader = plugin.getConfig().getStringList(SettingKey.GIST_HEADER.getKey());
+
+            if (!gistHeader.isEmpty()) {
+                for (String line : gistHeader) {
+                    gistContent.append(line).append("\n");
+                }
+            }
+
+            gistContent.append("\n");
+
+            for (OfflinePlayer player : playersWithPermission) {
+                long totalTime = plugin.getDatabaseManager().getTotalTime(player.getUniqueId());
+                long hours = (totalTime / 1000) / 3600;
+                long minutes = ((totalTime / 1000) % 3600) / 60;
+                long seconds = (totalTime / 1000) % 60;
+
+                long days = hours / 24;
+                hours = hours % 24;
+                String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+
+                gistContent.append(player.getName()).append(" has played for ").append(timeFormatted).append(".\n");
+            }
+
             HttpURLConnection connection = null;
             try {
                 String gistToken = plugin.getConfig().getString(SettingKey.GIST_TOKEN.getKey());
                 if (gistToken == null || gistToken.isEmpty()) {
                     plugin.getLogger().severe("No GitHub token found in config.yml!");
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        localeManager.sendMessage(sender, "command-dump-fail");
-                    });
+                    Bukkit.getScheduler().runTask(plugin, () -> localeManager.sendMessage(sender, "command-dump-fail"));
                     return;
                 }
 
                 GitHubGistClient gistClient = new GitHubGistClient(gistToken);
 
-                String gistUrl = gistClient.createGist(gistContent.toString(), "staff_activity.txt", false);
+                // Prefix din config și formatarea datei pentru numele fișierului
+                String filePrefix = plugin.getConfig().getString(SettingKey.FILE_PREFIX.getKey(), "staff_activity_");
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm");
+                String formattedDateTime = now.format(formatter);
+                String gistFileName = filePrefix + formattedDateTime + ".yml";
 
-                String prefix = localeManager.getLocaleMessage("prefix");
-                String successMessage = prefix + localeManager.getLocaleMessage("command-dump-success").replace("{link}", gistUrl);
-                Bukkit.getScheduler().runTask(plugin, () -> sender.sendMessage(successMessage));
+                String gistUrl = gistClient.createGist(gistContent.toString(), gistFileName, false);
+
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    String prefix = localeManager.getLocaleMessage("prefix");
+                    String successMessage = prefix + localeManager.getLocaleMessage("command-dump-success").replace("{link}", gistUrl);
+                    sender.sendMessage(successMessage);
+                });
 
             } catch (Exception e) {
                 plugin.getLogger().severe("Failed to post to GitHub Gist: " + e.getMessage());
@@ -132,5 +140,4 @@ public class DumpCommand extends BaseCommand {
     public List<String> tabComplete(ColdTracker plugin, CommandSender sender, String[] args) {
         return Collections.emptyList();
     }
-
 }
