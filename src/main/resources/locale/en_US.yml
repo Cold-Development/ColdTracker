@@ -40,5 +40,11 @@ command-dump-warning: '&eWARNING: &cThis operation will dump the data from the c
 command-dump-success: '&7Database dump &asuccessful&7! Link: &a{link}'
 command-dump-fail: '&cFailed to generate Gist link. Check console for any errors.'
 
+# Export Command
+command-export-description: '&8 - &c/coldtracker export &7- Exports the data to plugins/ColdTracker'
+command-export-warning: '&eWARNING: &cExport file already exists. Use &a/coldtracker export confirm &cto overwrite.'
+command-export-success: '&7Export &asuccessful&7. The data has been saved to &aplugins/ColdTracker&7.'
+command-export-fail: '&cFailed to save export.yml. Check the console for errors.'
+
 # Version Command
 command-version-description: '&8 - &c/coldtracker version &7- Display the version info for ColdTracker'
