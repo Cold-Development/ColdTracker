@@ -24,6 +24,7 @@ public class Commander extends CommandHandler {
         this.registerCommand(new VersionCommand());
         this.registerCommand(new ShowTimeCommand());
         this.registerCommand(new DumpCommand());
+        this.registerCommand(new ExportCommand());
 
     }
 
