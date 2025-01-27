@@ -21,6 +21,7 @@ command-showtime-usage: '&7Usage: &c/coldtracker showtime <playername>'
 command-showvotes-description: '&8 - &c/coldtracker showvotes <playername> &7- Show player''s total votes tracked'
 showvotes-message: "&c{player} &7has a total of &c{votes}&7 votes."
 command-showvotes-disabled: '&7Vote tracker &cdisabled&7. Please consult configuration file.'
+command-votes-not-available: '&7Voting plugin not detected. Vote tracking is &cunavailable&7.'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Wipe current SQLite database'
