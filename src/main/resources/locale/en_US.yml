@@ -49,7 +49,7 @@ command-dump-fail: '&cFailed to generate Gist link. Check console for any errors
 # Export Command
 command-export-description: '&8 - &c/coldtracker export &7- Exports the data to plugins/ColdTracker'
 command-export-warning: '&eWARNING: &cExport file already exists. Use &a/coldtracker export confirm &cto overwrite.'
-command-export-success: '&7Export &asuccessful&7. The data has been saved to &aplugins/ColdTracker&7.'
+command-export-success: '&7Export &asuccessful&7. The data has been saved to &aplugins/ColdTracker/{folder}&7.'
 command-export-fail: '&cFailed to save export.yml. Check the console for errors.'
 
 # Version Command
