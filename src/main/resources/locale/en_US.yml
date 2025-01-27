@@ -17,6 +17,11 @@ no-staff-member: '&7&c{player} &7is not a staff member.'
 showtime-message: '&c{player} &7has played for &c{time}&7.'
 command-showtime-usage: '&7Usage: &c/coldtracker showtime <playername>'
 
+# ShowVote Command Message
+command-showvotes-description: '&8 - &c/coldtracker showvotes <playername> &7- Show player''s total votes tracked'
+showvotes-message: "&c{player} &7has a total of &c{votes}&7 votes."
+command-showvotes-disabled: '&7Vote tracker &cdisabled&7. Please consult configuration file.'
+
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Wipe current SQLite database'
 command-wipe-usage: '&7Usage: &c/coldtracker wipe'
