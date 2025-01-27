@@ -21,6 +21,7 @@ command-showtime-usage: '&7Utilizare: &c/coldtracker showtime <playername>'
 command-showvotes-description: '&8 - &c/coldtracker showvotes <playername> &7- Afișează numărul total de voturi al jucătorului'
 showvotes-message: "&c{player} &7are un total de &c{votes}&7 voturi."
 command-showvotes-disabled: '&7Monitorizarea voturilor este &cdezactivată&7. Consultați fișierul de configurare.'
+command-votes-not-available: '&7Plugin de voturi nedetectat. Monitorizarea voturilor este &cindisponibilă&7.'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Șterge baza de date SQLite actuală'
