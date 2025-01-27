@@ -6,7 +6,7 @@
 
     <groupId>dev.padrewin</groupId>
     <artifactId>coldtracker</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
 
     <name>ColdTracker</name>
@@ -16,7 +16,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>colddev-repo</id>
+            <url>https://hub.colddev.dev/repository/public-releases/</url>
+        </repository>
+    </distributionManagement>
+
     <build>
+        <finalName>ColdTracker-${project.version}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
@@ -26,21 +34,10 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>-Xlint:-options</arg>
+                    </compilerArgs>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -56,28 +53,28 @@
                         <configuration>
                             <minimizeJar>true</minimizeJar>
                             <relocations>
-                                <!-- Relocating dev.padrewin.colddev to avoid conflicts -->
                                 <relocation>
                                     <pattern>dev.padrewin.colddev</pattern>
                                     <shadedPattern>dev.padrewin.coldtracker.libs.coldplugin</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Maven Jar Plugin for custom JAR name -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
-                <configuration>
-                    <finalName>ColdTracker-${project.version}</finalName>
-                </configuration>
-            </plugin>
-
         </plugins>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -99,17 +96,13 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>luckperms</id>
-            <url>https://repo.luckperms.net/</url>
-        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>dev.padrewin</groupId>
             <artifactId>colddev</artifactId>
-            <version>1.4.4</version>
+            <version>1.4.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -119,9 +112,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.vexsoftware</groupId>
+            <artifactId>nuvotifier-universal</artifactId>
+            <version>2.7.3</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/nuvotifier.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
-            <version>5.3</version>
+            <version>5.4</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
