@@ -21,6 +21,7 @@ command-showtime-usage: '&7用法：&c/coldtracker showtime <playername>'
 command-showvotes-description: '&8 - &c/coldtracker showvotes <playername> &7- 显示玩家的总投票数'
 showvotes-message: "&c{player} &7共有 &c{votes}&7 投票。"
 command-showvotes-disabled: '&7投票追踪已&c禁用&7。请检查配置文件。'
+command-votes-not-available: '&7未检测到投票插件。投票追踪功能&c不可用&7。'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- 清除当前 SQLite 数据库'
