@@ -49,7 +49,7 @@ command-dump-fail: '&c生成 Gist 链接失败。检查控制台以获取错误�
 # Export Command
 command-export-description: '&8 - &c/coldtracker export &7- 将数据导出到 plugins/ColdTracker'
 command-export-warning: '&e警告：&c导出文件已存在。使用 &a/coldtracker export confirm &c覆盖。'
-command-export-success: '&7导出成功&7。数据已保存到 &aplugins/ColdTracker&7。'
+command-export-success: '&7导出成功&7。数据已保存到 &aplugins/ColdTracker/{folder}&7。'
 command-export-fail: '&c保存到 export.yml 失败。检查控制台以获取错误信息。'
 
 # Version Command
