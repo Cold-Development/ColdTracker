@@ -141,6 +141,10 @@ public final class ColdTracker extends ColdPlugin {
         }
     }
 
+    public boolean isVotifierAvailable() {
+        return votifierAvailable;
+    }
+
     private void setupVotifier() {
         if (getServer().getPluginManager().isPluginEnabled("Votifier") ||
                 getServer().getPluginManager().isPluginEnabled("nuvotifier")) {
@@ -148,7 +152,7 @@ public final class ColdTracker extends ColdPlugin {
             getLogger().info(ANSI_LIGHT_BLUE + "Votifier API loaded successfully. " + ANSI_BOLD + ANSI_GREEN + "✔" + ANSI_RESET);
         } else {
             votifierAvailable = false;
-            getLogger().warning(ANSI_LIGHT_BLUE + "Votifier API not found. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
+            getLogger().warning(ANSI_LIGHT_BLUE + "No voting plugin found (Votifier/nuvotifier). Vote-related features will be disabled. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
         }
     }
 
