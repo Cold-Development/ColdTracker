@@ -1,6 +1,7 @@
 package dev.padrewin.coldtracker.database;
 
 import dev.padrewin.coldtracker.ColdTracker;
+import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.sql.*;
@@ -152,6 +153,42 @@ public class DatabaseManager {
     }
 
     public void closeConnection() {
+        // Procesăm timpul și voturile pentru toți jucătorii conectați înainte de a închide baza de date
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            UUID playerUUID = player.getUniqueId();
+            long leaveTime = System.currentTimeMillis();
+
+            // Procesăm timpul de joc pentru jucătorii cu permisiunea "coldtracker.tracktime"
+            if (player.hasPermission("coldtracker.tracktime")) {
+                Long joinTime = plugin.getJoinTimes().remove(playerUUID);
+
+                if (joinTime != null) {
+                    long sessionTime = leaveTime - joinTime;
+                    addPlaySession(playerUUID, player.getName(), sessionTime);
+
+                    if (plugin.getConfig().getBoolean("debug", false)) {
+                        plugin.getLogger().info("[DEBUG] Processed disconnect for player " + player.getName() +
+                                ". Session time: " + sessionTime + " ms");
+                    }
+                } else if (plugin.getConfig().getBoolean("debug", false)) {
+                    plugin.getLogger().warning("[DEBUG] No join time found for player " + player.getName());
+                }
+            }
+
+            // Procesăm voturile pentru jucătorii cu permisiunea "coldtracker.trackvote"
+            if (player.hasPermission("coldtracker.trackvote") && plugin.getConfig().getBoolean("track-votes", false)) {
+                int totalVotes = getTotalVotes(playerUUID);
+
+                if (plugin.getConfig().getBoolean("debug", false)) {
+                    plugin.getLogger().info("[DEBUG] Processed votes for player " + player.getName() +
+                            ". Total votes: " + totalVotes);
+                }
+
+                // Aici putem adăuga alte operațiuni dacă e necesar
+            }
+        });
+
+        // Închidem conexiunea la baza de date
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
@@ -162,4 +199,5 @@ public class DatabaseManager {
             e.printStackTrace();
         }
     }
+
 }
