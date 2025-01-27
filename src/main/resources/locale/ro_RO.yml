@@ -49,7 +49,7 @@ command-dump-fail: '&cEroare la generarea link-ului Gist. Verifică consola pent
 # Export Command
 command-export-description: '&8 - &c/coldtracker export &7- Exportă datele în plugins/ColdTracker'
 command-export-warning: '&eATENȚIE: &cFișierul de export există deja. Folosește &a/coldtracker export confirm &cpentru a suprascrie.'
-command-export-success: '&7Exportare realizată cu &asucces&7. Datele au fost salvate în &aplugins/ColdTracker&7.'
+command-export-success: '&7Exportare realizată cu &asucces&7. Datele au fost salvate în &aplugins/ColdTracker/{folder}&7.'
 command-export-fail: '&cEroare la salvarea export.yml. Verifică consola pentru erori.'
 
 # Version Command
