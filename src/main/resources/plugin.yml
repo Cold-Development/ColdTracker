@@ -1,9 +1,9 @@
 name: ColdTracker
 version: '@version@'
 main: dev.padrewin.coldtracker.ColdTracker
-api-version: '1.20'
+api-version: '1.13'
 authors: [ padrewin ]
-depend: [LuckPerms]
+depend: [LuckPerms, Votifier]
 
 commands:
   coldtracker:
@@ -16,6 +16,8 @@ commands:
     permission: "coldtracker.wipe"
   dump:
     permission: "coldtracker.dump"
+  showvotes:
+    permission: "coldtracker.showvotes"
 
 permissions:
   coldtracker.*:
@@ -54,4 +56,12 @@ permissions:
 
   coldtracker.export:
     description: Gives access to the export command
+    default: op
+
+  coldtracker.showvotes:
+    description: Gives access to the showvotes command
+    default: op
+
+  coldtracker.trackvote:
+    description: Gives access to track the votes
     default: op
