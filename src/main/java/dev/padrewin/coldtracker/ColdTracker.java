@@ -17,7 +17,10 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import static dev.padrewin.colddev.manager.AbstractDataManager.*;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public final class ColdTracker extends ColdPlugin {
 
@@ -36,6 +39,7 @@ public final class ColdTracker extends ColdPlugin {
     private static ColdTracker instance;
     private LuckPerms luckPerms;
     private boolean votifierAvailable;
+    private final Map<UUID, Long> joinTimes = new HashMap<>();
 
     public ColdTracker() {
         super("Cold-Development", "ColdTracker", 23682, null, LocaleManager.class, null);
@@ -46,6 +50,7 @@ public final class ColdTracker extends ColdPlugin {
     @Override
     public void enable() {
         instance = this;
+
         setupLuckPerms();
         setupVotifier();
 
@@ -56,9 +61,13 @@ public final class ColdTracker extends ColdPlugin {
         String databasePath = connector.getDatabasePath();
         getLogger().info(ANSI_GREEN + "Database path: " + ANSI_YELLOW + databasePath + ANSI_RESET);
 
-
+        // Initialize time tracking event listener
         getServer().getPluginManager().registerEvents(new PlayerTrackingListener(this), this);
-        getServer().getPluginManager().registerEvents(new StaffVoteListener(this), this);
+
+        // Initialize vote tracking event listener
+        if (votifierAvailable) {
+            getServer().getPluginManager().registerEvents(new StaffVoteListener(this), this);
+        }
 
         getManager(PluginUpdateManager.class);
 
@@ -88,7 +97,18 @@ public final class ColdTracker extends ColdPlugin {
         if (databaseManager != null) {
             databaseManager.closeConnection();
         }
-        getLogger().info("ColdTracker unloaded.");
+        getLogger().info("");
+        getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
+        getLogger().info("");
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+    }
+
+    public Map<UUID, Long> getJoinTimes() {
+        return joinTimes;
     }
 
     @Override
@@ -106,12 +126,13 @@ public final class ColdTracker extends ColdPlugin {
     @Override
     protected String[] getColdConfigHeader() {
         return new String[] {
-                "  ____  ___   _      ____   ",
-                " / ___|/ _ \\ | |    |  _ \\  ",
-                "| |   | | | || |    | | | | ",
-                "| |___| |_| || |___ | |_| | ",
-                " \\____|\\___/ |_____|_____/  ",
-                "                           "
+                " ██████╗ ██████╗ ██╗     ██████╗ ",
+                "██╔════╝██╔═══██╗██║     ██╔══██╗",
+                "██║     ██║   ██║██║     ██║  ██║",
+                "██║     ██║   ██║██║     ██║  ██║",
+                "╚██████╗╚██████╔╝███████╗██████╔╝",
+                " ╚═════╝ ╚═════╝ ╚══════╝╚═════╝ ",
+                "                                 "
         };
     }
 
@@ -152,7 +173,7 @@ public final class ColdTracker extends ColdPlugin {
             getLogger().info(ANSI_LIGHT_BLUE + "Votifier API loaded successfully. " + ANSI_BOLD + ANSI_GREEN + "✔" + ANSI_RESET);
         } else {
             votifierAvailable = false;
-            getLogger().warning(ANSI_LIGHT_BLUE + "No voting plugin found (Votifier/nuvotifier). Vote-related features will be disabled. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
+            getLogger().warning(ANSI_LIGHT_BLUE + "No voting plugin found (nuvotifier). Vote-related features will be disabled. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
         }
     }
 
