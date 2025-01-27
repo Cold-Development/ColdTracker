@@ -102,7 +102,7 @@
         <dependency>
             <groupId>dev.padrewin</groupId>
             <artifactId>colddev</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.7</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -115,8 +115,7 @@
             <groupId>com.vexsoftware</groupId>
             <artifactId>nuvotifier-universal</artifactId>
             <version>2.7.3</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/nuvotifier.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.luckperms</groupId>
