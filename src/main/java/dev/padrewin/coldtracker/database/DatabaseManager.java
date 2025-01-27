@@ -1,16 +1,11 @@
 package dev.padrewin.coldtracker.database;
 
 import dev.padrewin.coldtracker.ColdTracker;
-import dev.padrewin.coldtracker.setting.SettingKey;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.UUID;
+
 import static dev.padrewin.colddev.manager.AbstractDataManager.*;
 
 public class DatabaseManager {
@@ -41,16 +36,27 @@ public class DatabaseManager {
     }
 
     private void createTables() {
-        String sql = "CREATE TABLE IF NOT EXISTS staff_time ("
-                + "player_uuid TEXT PRIMARY KEY,"
-                + "player_name TEXT NOT NULL,"
-                + "total_time INTEGER NOT NULL"
-                + ");";
+        // Table for playtime
+        String createPlaytimeTable = "CREATE TABLE IF NOT EXISTS staff_time (" +
+                "player_uuid TEXT PRIMARY KEY," +
+                "player_name TEXT NOT NULL," +
+                "total_time INTEGER NOT NULL" +
+                ");";
+
+        // Table for votes
+        String createVotesTable = "CREATE TABLE IF NOT EXISTS staff_votes (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "player_uuid TEXT NOT NULL," +
+                "player_name TEXT NOT NULL," +
+                "service_name TEXT NOT NULL," +
+                "vote_time TEXT NOT NULL" +
+                ");";
 
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute(sql);
+            stmt.execute(createPlaytimeTable);
+            stmt.execute(createVotesTable);
         } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to create the 'staff_time' table!");
+            plugin.getLogger().severe("Failed to create database tables!");
             e.printStackTrace();
         }
     }
@@ -71,8 +77,8 @@ public class DatabaseManager {
     }
 
     public void addPlaySession(UUID playerUUID, String playerName, long sessionTime) {
-        String query = "INSERT INTO staff_time (player_uuid, player_name, total_time) VALUES (?, ?, ?) "
-                + "ON CONFLICT(player_uuid) DO UPDATE SET total_time = total_time + ?";
+        String query = "INSERT INTO staff_time (player_uuid, player_name, total_time) VALUES (?, ?, ?) " +
+                "ON CONFLICT(player_uuid) DO UPDATE SET total_time = total_time + ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             if (plugin.getConfig().getBoolean("debug", false)) {
                 plugin.getLogger().warning("[DEBUG] Adding play session for player " + playerName + " with sessionTime: " + sessionTime);
@@ -93,6 +99,58 @@ public class DatabaseManager {
         }
     }
 
+    public void addVote(UUID playerUUID, String playerName, String serviceName, String timestamp) {
+        String query = "INSERT INTO staff_votes (player_uuid, player_name, service_name, vote_time) " +
+                "VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, playerUUID.toString());
+            stmt.setString(2, playerName);
+            stmt.setString(3, serviceName);
+            stmt.setString(4, timestamp);
+            stmt.executeUpdate();
+
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().info("[DEBUG] Vote logged for player " + playerName +
+                        " (Service: " + serviceName + ", Timestamp: " + timestamp + ").");
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Failed to log vote for player " + playerName + "!");
+            e.printStackTrace();
+        }
+    }
+
+    public int getTotalVotes(UUID playerUUID) {
+        String query = "SELECT COUNT(*) AS vote_count FROM staff_votes WHERE player_uuid = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, playerUUID.toString());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("vote_count");
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Failed to get total votes for player " + playerUUID + "!");
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public void wipeDatabaseTables() {
+        String sql1 = "DELETE FROM staff_time";
+        String sql2 = "DELETE FROM staff_votes";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql1);
+            stmt.executeUpdate(sql2);
+
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().info("All data wiped from 'staff_time' and 'staff_votes' tables.");
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Failed to wipe data from database tables!");
+            e.printStackTrace();
+        }
+    }
+
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -104,19 +162,4 @@ public class DatabaseManager {
             e.printStackTrace();
         }
     }
-
-    public void wipeDatabaseTables() {
-        String sql = "DELETE FROM staff_time";
-
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(sql);
-            if (plugin.getConfig().getBoolean("debug", false)) {
-                plugin.getLogger().info("All data wiped from 'staff_time' table.");
-            }
-        } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to wipe data from 'staff_time' table!");
-            e.printStackTrace();
-        }
-    }
-
 }
