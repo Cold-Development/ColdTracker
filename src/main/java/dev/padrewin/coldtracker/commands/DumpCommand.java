@@ -17,10 +17,7 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class DumpCommand extends BaseCommand {
@@ -75,8 +72,11 @@ public class DumpCommand extends BaseCommand {
 
             gistContent.append("\n");
 
+            boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false); // Verificăm dacă voturile sunt activate
+
             for (OfflinePlayer player : playersWithPermission) {
-                long totalTime = plugin.getDatabaseManager().getTotalTime(player.getUniqueId());
+                UUID playerUUID = player.getUniqueId();
+                long totalTime = plugin.getDatabaseManager().getTotalTime(playerUUID);
                 long hours = (totalTime / 1000) / 3600;
                 long minutes = ((totalTime / 1000) % 3600) / 60;
                 long seconds = (totalTime / 1000) % 60;
@@ -85,7 +85,22 @@ public class DumpCommand extends BaseCommand {
                 hours = hours % 24;
                 String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
 
-                gistContent.append(player.getName()).append(" has played for ").append(timeFormatted).append(".\n");
+                StringBuilder playerData = new StringBuilder();
+                playerData.append(player.getName()).append(" has played for ").append(timeFormatted);
+
+                // Adăugăm voturile doar dacă track-votes este activ și jucătorul are permisiunea
+                if (trackVotes) {
+                    CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
+                    userFuture.thenAccept(user -> {
+                        if (user != null && user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
+                            int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
+                            playerData.append(" and ").append(totalVotes).append(" votes");
+                        }
+                    }).join();
+                }
+
+                playerData.append(".\n");
+                gistContent.append(playerData);
             }
 
             HttpURLConnection connection = null;
