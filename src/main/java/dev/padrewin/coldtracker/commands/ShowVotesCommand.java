@@ -26,6 +26,11 @@ public class ShowVotesCommand extends BaseCommand {
     public void execute(@NotNull ColdTracker plugin, @NotNull CommandSender sender, @NotNull String[] args) {
         LocaleManager localeManager = plugin.getManager(LocaleManager.class);
 
+        if (!plugin.isVotifierAvailable()) {
+            localeManager.sendMessage(sender, "command-votes-not-available");
+            return;
+        }
+
         if (!plugin.getConfig().getBoolean("track-votes", false)) {
             localeManager.sendMessage(sender, "command-showvotes-disabled");
             return;
