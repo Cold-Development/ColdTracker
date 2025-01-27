@@ -14,7 +14,7 @@ public class SettingKey {
 
     private static final List<ColdSetting<?>> KEYS = new ArrayList<>();
 
-    public static final ColdSetting<String> BASE_COMMAND_REDIRECT = create("base-command-redirect", STRING, "", "Which command should we redirect to when using '/coldtracker' with no subcommand specified?", "You can use a value here such as 'version' to show the output of '/coldtracker version'", "If you have any aliases defined, do not use them here", "If left as blank, the default behavior of showing '/giveall version' with bypassed permissions will be used");
+    public static final ColdSetting<String> BASE_COMMAND_REDIRECT = create("base-command-redirect", STRING, "", "Which command should we redirect to when using '/coldtracker' with no subcommand specified?", "You can use a value here such as 'version' to show the output of '/coldtracker version'", "If you have any aliases defined, do not use them here", "If left as blank, the default behavior of showing '/coldtracker version' with bypassed permissions will be used");
 
     public static final ColdSetting<Boolean> DEBUG = create("debug", BOOLEAN, false, "Enable or disable debug logging for the plugin.", "If set to true, debug messages will be shown in the console.");
 
@@ -46,6 +46,10 @@ public class SettingKey {
             "Plugin: https://www.spigotmc.org/resources/nuvotifier.13449/",
             "If set to true, the plugin will track votes and include them in exports/dumps.",
             "If set to false, votes will be ignored.");
+
+    public static final ColdSetting<String> FOLDER_NAME = create("folder-name", STRING, "exported-database",
+            "The name of the folder where exported files will be saved.",
+            "If left blank, it will default to 'exported database'.");
 
     private static <T> ColdSetting<T> create(String key, ColdSettingSerializer<T> serializer, T defaultValue, String... comments) {
         ColdSetting<T> setting = ColdSetting.backed(ColdTracker.getInstance(), key, serializer, defaultValue, comments);
