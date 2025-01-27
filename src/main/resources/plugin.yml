@@ -29,6 +29,7 @@ permissions:
       coldtracker.wipe: true
       coldtracker.dump: true
       coldtracker.export: true
+      coldtracker.showvotes: true
 
   coldtracker.version:
     description: Gives access to the version command
