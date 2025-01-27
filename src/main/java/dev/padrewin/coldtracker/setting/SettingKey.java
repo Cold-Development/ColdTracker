@@ -42,6 +42,8 @@ public class SettingKey {
 
     public static final ColdSetting<Boolean> TRACK_VOTES = create("track-votes", BOOLEAN, false,
             "Enable or disable tracking of player votes.",
+            "This feature requires NuVotifier plugin to be installed.",
+            "Plugin: https://www.spigotmc.org/resources/nuvotifier.13449/",
             "If set to true, the plugin will track votes and include them in exports/dumps.",
             "If set to false, votes will be ignored.");
 
