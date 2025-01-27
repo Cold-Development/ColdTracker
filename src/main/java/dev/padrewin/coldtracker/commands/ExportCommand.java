@@ -32,12 +32,17 @@ public class ExportCommand extends BaseCommand {
             LocaleManager localeManager = plugin.getManager(LocaleManager.class);
             LuckPerms luckPerms = plugin.getLuckPerms();
 
+            String folderName = plugin.getConfig().getString("folder-name", "exported database");
+            File folder = new File(plugin.getDataFolder(), folderName);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm");
             String formattedDateTime = now.format(formatter);
 
-            String filePrefix = plugin.getConfig().getString(SettingKey.FILE_PREFIX.getKey(), "staff_activity_");
-            File file = new File(plugin.getDataFolder(), filePrefix + formattedDateTime + ".yml");
+            File file = new File(folder, "staff_activity_" + formattedDateTime + ".yml");
 
             if (file.exists() && (args.length == 0 || !args[0].equalsIgnoreCase("confirm"))) {
                 localeManager.sendMessage(sender, "command-export-warning");
@@ -53,7 +58,7 @@ public class ExportCommand extends BaseCommand {
                 file.delete();
             }
 
-            boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false); // Verificăm setarea din config
+            boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false);
 
             try (FileWriter writer = new FileWriter(file)) {
                 List<String> gistHeader = plugin.getConfig().getStringList(SettingKey.GIST_HEADER.getKey());
@@ -78,7 +83,6 @@ public class ExportCommand extends BaseCommand {
                             StringBuilder exportLine = new StringBuilder();
                             exportLine.append(player.getName()).append(" has a total time of ").append(timeFormatted);
 
-                            // Verificăm dacă track-votes este activ și dacă jucătorul are permisiunea corectă
                             if (trackVotes && user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
                                 int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
                                 exportLine.append(" and ").append(totalVotes).append(" votes");
@@ -95,7 +99,9 @@ public class ExportCommand extends BaseCommand {
                     }).join();
                 }
 
-                localeManager.sendMessage(sender, "command-export-success");
+                String successMessage = localeManager.getLocaleMessage("command-export-success")
+                        .replace("{folder}", folderName);
+                sender.sendMessage(successMessage);
 
             } catch (IOException e) {
                 plugin.getLogger().severe("Failed to create " + file.getName() + ": " + e.getMessage());
