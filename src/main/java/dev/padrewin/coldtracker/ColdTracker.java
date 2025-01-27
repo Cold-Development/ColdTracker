@@ -8,6 +8,7 @@ import dev.padrewin.colddev.manager.Manager;
 import dev.padrewin.colddev.manager.PluginUpdateManager;
 import dev.padrewin.coldtracker.database.DatabaseManager;
 import dev.padrewin.coldtracker.listeners.PlayerTrackingListener;
+import dev.padrewin.coldtracker.listeners.StaffVoteListener;
 import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.manager.LocaleManager;
 import dev.padrewin.coldtracker.setting.SettingKey;
@@ -34,6 +35,7 @@ public final class ColdTracker extends ColdPlugin {
 
     private static ColdTracker instance;
     private LuckPerms luckPerms;
+    private boolean votifierAvailable;
 
     public ColdTracker() {
         super("Cold-Development", "ColdTracker", 23682, null, LocaleManager.class, null);
@@ -45,6 +47,7 @@ public final class ColdTracker extends ColdPlugin {
     public void enable() {
         instance = this;
         setupLuckPerms();
+        setupVotifier();
 
         // Initialize DatabaseManager
         databaseManager = new DatabaseManager(this, "coldtracker.db");
@@ -55,6 +58,7 @@ public final class ColdTracker extends ColdPlugin {
 
 
         getServer().getPluginManager().registerEvents(new PlayerTrackingListener(this), this);
+        getServer().getPluginManager().registerEvents(new StaffVoteListener(this), this);
 
         getManager(PluginUpdateManager.class);
 
@@ -134,6 +138,17 @@ public final class ColdTracker extends ColdPlugin {
 
         } else {
             getLogger().warning(ANSI_LIGHT_BLUE + "LuckPerms API not found. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
+        }
+    }
+
+    private void setupVotifier() {
+        if (getServer().getPluginManager().isPluginEnabled("Votifier") ||
+                getServer().getPluginManager().isPluginEnabled("nuvotifier")) {
+            votifierAvailable = true;
+            getLogger().info(ANSI_LIGHT_BLUE + "Votifier API loaded successfully. " + ANSI_BOLD + ANSI_GREEN + "✔" + ANSI_RESET);
+        } else {
+            votifierAvailable = false;
+            getLogger().warning(ANSI_LIGHT_BLUE + "Votifier API not found. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
         }
     }
 
