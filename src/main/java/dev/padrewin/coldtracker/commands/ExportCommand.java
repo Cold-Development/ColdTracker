@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class ExportCommand extends BaseCommand {
@@ -44,13 +45,15 @@ public class ExportCommand extends BaseCommand {
             }
 
             if (args.length > 1 || (args.length == 1 && !args[0].equalsIgnoreCase("confirm") && file.exists())) {
-                localeManager.sendMessage(sender, "command-export-usage");
+                localeManager.sendMessage(sender, "command-export-description");
                 return;
             }
 
             if (file.exists()) {
                 file.delete();
             }
+
+            boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false); // Verificăm setarea din config
 
             try (FileWriter writer = new FileWriter(file)) {
                 List<String> gistHeader = plugin.getConfig().getStringList(SettingKey.GIST_HEADER.getKey());
@@ -62,7 +65,8 @@ public class ExportCommand extends BaseCommand {
                     CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(player.getUniqueId());
                     userFuture.thenAccept(user -> {
                         if (user != null && user.getCachedData().getPermissionData().checkPermission("coldtracker.tracktime").asBoolean()) {
-                            long totalTime = plugin.getDatabaseManager().getTotalTime(player.getUniqueId());
+                            UUID playerUUID = player.getUniqueId();
+                            long totalTime = plugin.getDatabaseManager().getTotalTime(playerUUID);
                             long hours = (totalTime / 1000) / 3600;
                             long minutes = ((totalTime / 1000) % 3600) / 60;
                             long seconds = (totalTime / 1000) % 60;
@@ -71,8 +75,19 @@ public class ExportCommand extends BaseCommand {
                             hours = hours % 24;
                             String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
 
+                            StringBuilder exportLine = new StringBuilder();
+                            exportLine.append(player.getName()).append(" has a total time of ").append(timeFormatted);
+
+                            // Verificăm dacă track-votes este activ și dacă jucătorul are permisiunea corectă
+                            if (trackVotes && user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
+                                int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
+                                exportLine.append(" and ").append(totalVotes).append(" votes");
+                            }
+
+                            exportLine.append(".\n");
+
                             try {
-                                writer.write(player.getName() + " has played for " + timeFormatted + "\n");
+                                writer.write(exportLine.toString());
                             } catch (IOException e) {
                                 plugin.getLogger().severe("Failed to write player data to " + file.getName() + ": " + e.getMessage());
                             }
