@@ -99,13 +99,17 @@ public class ExportCommand extends BaseCommand {
                     }).join();
                 }
 
-                String successMessage = localeManager.getLocaleMessage("command-export-success")
+                String prefix = localeManager.getLocaleMessage("prefix");
+                String successMessage = prefix + localeManager.getLocaleMessage("command-export-success")
                         .replace("{folder}", folderName);
                 sender.sendMessage(successMessage);
 
             } catch (IOException e) {
                 plugin.getLogger().severe("Failed to create " + file.getName() + ": " + e.getMessage());
-                localeManager.sendMessage(sender, "command-export-fail");
+
+                String prefix = localeManager.getLocaleMessage("prefix");
+                String failMessage = prefix + localeManager.getLocaleMessage("command-export-fail");
+                sender.sendMessage(failMessage);
             }
         });
     }
