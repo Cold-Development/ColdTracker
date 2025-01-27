@@ -3,11 +3,13 @@ version: '@version@'
 main: dev.padrewin.coldtracker.ColdTracker
 api-version: '1.13'
 authors: [ padrewin ]
-depend: [LuckPerms, Votifier]
+depend: [LuckPerms]
+softdepend: [Votifier]
 
 commands:
   coldtracker:
     permission: "coldtracker.version"
+    aliases: [ct, coldtrack, ctrack, coldt, track, ctracker]
   reload:
     permission: "coldtracker.reload"
   showtime:
