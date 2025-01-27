@@ -13,7 +13,8 @@ ColdTracker is an advanced plugin for Minecraft servers that enhances the manage
 ## 📖 Documentation
 All information is included and can be found in this repository's [**Wiki**](https://github.com/Cold-Development/ColdTracker/wiki).<br>
 For any questions or support, you can join our [**Discord server**](https://discord.colddev.dev). Here you can find all the support you need.<br>
-![ColdTracker](https://imgur.com/vUpbz8I.png)
+![image](https://github.com/user-attachments/assets/62ae2724-6458-4d06-92e5-44851294213a)
+![image](https://github.com/user-attachments/assets/eab722ab-57af-4112-a26d-95b93aa05d85)
 
 ---
 ## ⚙️ Server compatibility<br>
