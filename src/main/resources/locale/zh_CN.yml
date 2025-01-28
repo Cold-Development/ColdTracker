@@ -2,61 +2,63 @@
 prefix: '&8「&#635AA7C&#7D72B7o&#978BC7l&#B2A3D8d&#CCBCE8T&#E6D4F8r&#D8B8F8a&#C99CF7c&#BB80F7k&#AC64F6e&#9E48F6r&8」&7» '
 
 # Help Command
-command-help-description: '&8 - &c/coldtracker help &7- 显示帮助菜单... 你已经到达'
-command-help-title: '&c可用命令:'
+command-help-description: '&8 - &c/coldtracker help &7- 显示帮助菜单... 你到了'
+command-help-title: '&c可用命令：'
 
 # Misc
-no-permission: '&c你没有权限这样做!'
-unknown-command: '&c未知命令 &4%input%&c.'
-invalid-command-usage: '&c无效的命令用法。'
-player-not-found: '&7无法找到玩家: &c{player}&7。'
+no-permission: '&c你没有权限执行此命令！'
+unknown-command: '&c未知命令 &4%input%&c。'
+invalid-command-usage: '&c命令使用方式无效。'
+player-not-found: '&7未找到玩家：&c{player}&7。'
 
 # Showtime Command Message
-command-showtime-description: '&8 - &c/coldtracker showtime <playername> &7- 显示玩家的总在线时间'
-no-staff-member: '&7&c{player} &7不是团队成员。'
-showtime-message: '&c{player} &7的总在线时间为 &c{time}&7。'
-command-showtime-usage: '&7用法: &c/coldtracker showtime <playername>'
+command-showtime-description: '&8 - &c/coldtracker showtime <playername> &7- 显示玩家的总游戏时间'
+no-staff-member: '&7&c{player} &7不是工作人员。'
+showtime-message: '&c{player} &7的游戏时间为 &c{time}&7。'
+command-showtime-usage: '&7用法：&c/coldtracker showtime <playername>'
 
 # ShowVote Command Message
 command-showvotes-description: '&8 - &c/coldtracker showvotes <playername> &7- 显示玩家的总投票数'
-showvotes-message: "&c{player} &7总共获得 &c{votes}&7 次投票。"
-command-showvotes-disabled: '&7投票跟踪功能已&c禁用&7。请检查配置文件。'
-command-votes-not-available: '&7未检测到投票插件。投票跟踪功能&c不可用&7。'
+showvotes-message: "&c{player} &7的总投票数为 &c{votes}&7。"
+command-showvotes-disabled: '&7投票追踪已被 &c禁用&7。请检查配置文件。'
+command-votes-not-available: '&7未检测到投票插件。投票追踪 &c不可用&7。'
 
 # Stats Command
 command-stats-description: '&8 - &c/coldtracker stats &7- 查看你的个人统计数据'
-command-stats-player-only: '&c只有玩家可以使用此命令。'
+command-stats-player-only: '&c此命令仅供玩家使用。'
 command-stats-console-no-self: '&7控制台无法拥有统计数据。'
-command-stats-playtime: '&7你的总在线时间为 &c{time}&7。'
-command-stats-votes: '&7以及 &c{votes} 次投票&7。'
+command-stats-self-title: '&7你的统计：'
+command-stats-other-title: '&c{player}&7 的统计：'
+command-stats-playtime-prefix: '• &7游戏时间：&c{time} 🕓'
+command-stats-votes-prefix: '• &7投票数：&c{votes} 📩'
 
 # Database message warnings
-command-wipe-description: '&8 - &c/coldtracker wipe &7- 清空当前SQLite数据库'
-command-wipe-usage: '&7用法: &c/coldtracker wipe'
-command-wipe-warning: '&e警告: &c此操作将删除活动数据库中的所有数据。 &c如果您确定，请使用 &a/coldtracker wipe confirm&c。'
-command-wipe-success: '&7数据库中的所有数据已被&成功清除&7。'
+command-wipe-description: '&8 - &c/coldtracker wipe &7- 清除当前SQLite数据库'
+command-wipe-usage: '&7用法：&c/coldtracker wipe'
+command-wipe-warning: '&e警告：&c此操作将删除活动数据库中的所有数据。&c如果你确定，请使用 &a/coldtracker wipe confirm&c。'
+command-wipe-success: '&7数据库中的所有数据已被 &c成功清除&7。'
 
 # Base Command Message
 base-command-color: '&7'
 base-command-help: '&7使用 &c/coldtracker help &7查看命令信息。'
 
 # Reload Command
-command-reload-description: '&8 - &c/coldtracker reload &7- 重载插件'
-command-reload-usage: '&7用法: &c/coldtracker reload'
-command-reload-success: '&7配置和本地化文件已重新加载。'
+command-reload-description: '&8 - &c/coldtracker reload &7- 重新加载插件'
+command-reload-usage: '&7用法：&c/coldtracker reload'
+command-reload-success: '&7配置文件和语言文件已重新加载。'
 
 # Dump Command
-command-dump-disabled: '&7Gist转储功能已&c禁用&7。请检查配置文件。'
-command-dump-description: '&8 - &c/coldtracker dump &7- 转储当前数据库数据到Gist'
-command-dump-usage: '&7用法: &c/coldtracker dump'
-command-dump-warning: '&e警告: &c此操作将转储当前数据库的数据。使用 &a/coldtracker dump confirm&c 继续。'
-command-dump-success: '&7数据库转储已&成功完成&7！链接: &a{link}'
+command-dump-disabled: '&7Gist转储已被 &c禁用&7。请检查配置文件。'
+command-dump-description: '&8 - &c/coldtracker dump &7- 将当前数据库的数据导出到Gist'
+command-dump-usage: '&7用法：&c/coldtracker dump'
+command-dump-warning: '&e警告：&c此操作将导出当前数据库的数据。使用 &a/coldtracker dump confirm&c 继续操作。'
+command-dump-success: '&7数据库导出 &c成功&7！链接：&a{link}'
 command-dump-fail: '&c生成Gist链接失败。请检查控制台中的错误信息。'
 
 # Export Command
 command-export-description: '&8 - &c/coldtracker export &7- 将数据导出到 plugins/ColdTracker'
-command-export-warning: '&e警告: &c导出文件已存在。使用 &a/coldtracker export confirm &c覆盖它。'
-command-export-success: '&7导出&成功完成&7。数据已保存到 &aplugins/ColdTracker/{folder}&7。'
+command-export-warning: '&e警告：&c导出文件已存在。使用 &a/coldtracker export confirm &c覆盖。'
+command-export-success: '&7导出 &c成功&7。数据已保存到 &aplugins/ColdTracker/{folder}&7。'
 command-export-fail: '&c保存 export.yml 失败。请检查控制台中的错误信息。'
 
 # Version Command
