@@ -25,7 +25,6 @@ command-votes-not-available: '&7未检测到投票插件。投票追踪 &c不可
 
 # Stats Command
 command-stats-description: '&8 - &c/coldtracker stats &7- 查看你的个人统计数据'
-command-stats-player-only: '&c此命令仅供玩家使用。'
 command-stats-console-no-self: '&7控制台无法拥有统计数据。'
 command-stats-self-title: '&7你的统计：'
 command-stats-other-title: '&c{player}&7 的统计：'

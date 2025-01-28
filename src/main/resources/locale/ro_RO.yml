@@ -25,7 +25,6 @@ command-votes-not-available: '&7Nu a fost detectat niciun plugin de voturi. Trac
 
 # Stats Command
 command-stats-description: '&8 - &c/coldtracker stats &7- Vizualizează statisticile tale personale'
-command-stats-player-only: '&cDoar jucătorii pot folosi această comandă.'
 command-stats-console-no-self: '&7Consola nu poate avea statistici.'
 command-stats-self-title: '&7Statistici personale:'
 command-stats-other-title: '&c{player}&7''s statistici:'

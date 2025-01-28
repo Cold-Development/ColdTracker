@@ -25,7 +25,6 @@ command-votes-not-available: '&7Voting plugin not detected. Vote tracking is &cu
 
 # Stats Command
 command-stats-description: '&8 - &c/coldtracker stats &7- View your personal stats'
-command-stats-player-only: '&cOnly players can use this command.'
 command-stats-console-no-self: '&7Console can''t have stats.'
 command-stats-self-title: '&7Your stats:'
 command-stats-other-title: '&c{player}''s &7stats:'
