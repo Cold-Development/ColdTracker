@@ -27,8 +27,10 @@ command-votes-not-available: '&7Voting plugin not detected. Vote tracking is &cu
 command-stats-description: '&8 - &c/coldtracker stats &7- View your personal stats'
 command-stats-player-only: '&cOnly players can use this command.'
 command-stats-console-no-self: '&7Console can''t have stats.'
-command-stats-playtime: '&7You have a total time of &c{time}&7.'
-command-stats-votes: '&7and &c{votes} votes&7.'
+command-stats-self-title: '&7Your stats:'
+command-stats-other-title: '&c{player}''s &7stats:'
+command-stats-playtime-prefix: '• &7Playtime: &c{time} 🕓'
+command-stats-votes-prefix: '• &7Votes: &c{votes} 📩'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Wipe current SQLite database'
