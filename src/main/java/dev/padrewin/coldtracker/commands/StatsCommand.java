@@ -24,20 +24,17 @@ public class StatsCommand extends BaseCommand {
         LocaleManager localeManager = plugin.getManager(LocaleManager.class);
         String prefix = localeManager.getLocaleMessage("prefix");
 
-        // Dacă comanda vine din consolă fără argumente
         if (!(sender instanceof Player) && args.length == 0) {
             sender.sendMessage(prefix + localeManager.getLocaleMessage("command-stats-console-no-self"));
             return;
         }
 
-        // Dacă comanda vine de la un jucător și nu are argumente
         if (args.length == 0 && sender instanceof Player) {
             Player player = (Player) sender;
-            showStats(plugin, localeManager, sender, player.getUniqueId(), player.getName());
+            showStats(plugin, localeManager, sender, player.getUniqueId(), player.getName(), true);
             return;
         }
 
-        // Dacă există argumente, verificăm permisiunile
         if (args.length == 1) {
             if (!(sender instanceof Player) || sender.hasPermission("coldtracker.stats.others")) {
                 String targetName = args[0];
@@ -50,7 +47,6 @@ public class StatsCommand extends BaseCommand {
 
                 UUID targetUUID = targetPlayer.getUniqueId();
 
-                // Verificăm permisiunile folosind LuckPerms
                 plugin.getLuckPerms().getUserManager().loadUser(targetUUID).thenAcceptAsync(user -> {
                     if (user == null) {
                         sender.sendMessage(prefix + localeManager.getLocaleMessage("player-not-found").replace("{player}", targetName));
@@ -65,7 +61,7 @@ public class StatsCommand extends BaseCommand {
                         return;
                     }
 
-                    showStats(plugin, localeManager, sender, targetUUID, targetName);
+                    showStats(plugin, localeManager, sender, targetUUID, targetName, false);
                 });
             } else {
                 sender.sendMessage(prefix + localeManager.getLocaleMessage("no-permission"));
@@ -75,8 +71,7 @@ public class StatsCommand extends BaseCommand {
         }
     }
 
-
-    private void showStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName) {
+    private void showStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName, boolean isSelf) {
         String prefix = localeManager.getLocaleMessage("prefix");
         long totalTime = plugin.getDatabaseManager().getTotalTime(playerUUID);
         long hours = (totalTime / 1000) / 3600;
@@ -88,34 +83,27 @@ public class StatsCommand extends BaseCommand {
 
         StringBuilder statsMessage = new StringBuilder();
 
-        boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false);
-        int totalVotes = trackVotes ? plugin.getDatabaseManager().getTotalVotes(playerUUID) : 0;
+        statsMessage.append(" \n");
 
-        // Dacă targetul este senderul
-        if (sender instanceof Player && ((Player) sender).getUniqueId().equals(playerUUID)) {
-            String playtimeMessage = localeManager.getLocaleMessage("command-stats-playtime").replace("{time}", timeFormatted);
-            // Eliminăm punctul doar dacă voturile sunt trackate
-            if (trackVotes) {
-                playtimeMessage = playtimeMessage.endsWith(".") ? playtimeMessage.substring(0, playtimeMessage.length() - 1) : playtimeMessage;
-            }
-            statsMessage.append(prefix).append(playtimeMessage);
+        if (isSelf) {
+            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-self-title")).append("\n");
         } else {
-            String playtimeMessage = localeManager.getLocaleMessage("showtime-message").replace("{player}", playerName).replace("{time}", timeFormatted);
-            // Eliminăm punctul doar dacă voturile sunt trackate
-            if (trackVotes) {
-                playtimeMessage = playtimeMessage.endsWith(".") ? playtimeMessage.substring(0, playtimeMessage.length() - 1) : playtimeMessage;
-            }
-            statsMessage.append(prefix).append(playtimeMessage);
+            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-other-title").replace("{player}", playerName)).append("\n");
         }
 
-        // Adăugăm voturile doar dacă sunt trackate
-        if (trackVotes) {
-            statsMessage.append(" ").append(localeManager.getLocaleMessage("command-stats-votes").replace("{votes}", String.valueOf(totalVotes)));
+        statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)).append("\n");
+
+        if (plugin.getConfig().getBoolean("track-votes", false)) {
+            int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
+            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-votes-prefix").replace("{votes}", String.valueOf(totalVotes))).append("\n");
         }
 
-        sender.sendMessage(statsMessage.toString());
+        statsMessage.append(" \n");
+
+        for (String line : statsMessage.toString().split("\n")) {
+            sender.sendMessage(line.isEmpty() ? " " : line);
+        }
     }
-
 
 
     @Override
