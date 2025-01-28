@@ -20,6 +20,8 @@ commands:
     permission: "coldtracker.dump"
   showvotes:
     permission: "coldtracker.showvotes"
+  stats:
+    permission: "coldtracker.stats"
 
 permissions:
   coldtracker.*:
@@ -32,6 +34,8 @@ permissions:
       coldtracker.dump: true
       coldtracker.export: true
       coldtracker.showvotes: true
+      coldtracker.stats: true
+      coldtracker.stats.others: true
 
   coldtracker.version:
     description: Gives access to the version command
@@ -67,4 +71,12 @@ permissions:
 
   coldtracker.trackvote:
     description: Gives access to track the votes
+    default: op
+
+  coldtracker.stats:
+    description: Gives access to the stats command
+    default: op
+
+  coldtracker.stats.others:
+    description: Gives access to view stats of other staff members
     default: op
