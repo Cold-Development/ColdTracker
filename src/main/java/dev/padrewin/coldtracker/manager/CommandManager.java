@@ -23,6 +23,7 @@ public class CommandManager extends Manager {
         },
         SHOWTIME,
         SHOWVOTES,
+        STATS,
         RELOAD,
         WIPE,
         VERSION,
