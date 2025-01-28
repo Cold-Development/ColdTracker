@@ -24,9 +24,22 @@ public class StatsCommand extends BaseCommand {
         LocaleManager localeManager = plugin.getManager(LocaleManager.class);
         String prefix = localeManager.getLocaleMessage("prefix");
 
-        // Console handling
-        if (!(sender instanceof Player)) {
-            if (args.length == 1) {
+        // Dacă comanda vine din consolă fără argumente
+        if (!(sender instanceof Player) && args.length == 0) {
+            sender.sendMessage(prefix + localeManager.getLocaleMessage("command-stats-console-no-self"));
+            return;
+        }
+
+        // Dacă comanda vine de la un jucător și nu are argumente
+        if (args.length == 0 && sender instanceof Player) {
+            Player player = (Player) sender;
+            showStats(plugin, localeManager, sender, player.getUniqueId(), player.getName());
+            return;
+        }
+
+        // Dacă există argumente, verificăm permisiunile
+        if (args.length == 1) {
+            if (!(sender instanceof Player) || sender.hasPermission("coldtracker.stats.others")) {
                 String targetName = args[0];
                 OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetName);
 
@@ -36,49 +49,32 @@ public class StatsCommand extends BaseCommand {
                 }
 
                 UUID targetUUID = targetPlayer.getUniqueId();
-                showStats(plugin, localeManager, sender, targetUUID, targetPlayer.getName());
+
+                // Verificăm permisiunile folosind LuckPerms
+                plugin.getLuckPerms().getUserManager().loadUser(targetUUID).thenAcceptAsync(user -> {
+                    if (user == null) {
+                        sender.sendMessage(prefix + localeManager.getLocaleMessage("player-not-found").replace("{player}", targetName));
+                        return;
+                    }
+
+                    boolean trackTime = user.getCachedData().getPermissionData().checkPermission("coldtracker.tracktime").asBoolean();
+                    boolean trackVotes = user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean();
+
+                    if (!trackTime && !trackVotes) {
+                        sender.sendMessage(prefix + localeManager.getLocaleMessage("no-staff-member").replace("{player}", targetName));
+                        return;
+                    }
+
+                    showStats(plugin, localeManager, sender, targetUUID, targetName);
+                });
             } else {
-                sender.sendMessage(prefix + localeManager.getLocaleMessage("command-stats-console-only"));
-            }
-            return;
-        }
-
-        // Player handling
-        Player player = (Player) sender;
-        UUID playerUUID = player.getUniqueId();
-
-        if (args.length == 0) {
-            // Self stats
-            showStats(plugin, localeManager, sender, playerUUID, player.getName());
-        } else if (args.length == 1) {
-            // Target stats
-            if (!sender.hasPermission("coldtracker.stats.others")) {
                 sender.sendMessage(prefix + localeManager.getLocaleMessage("no-permission"));
-                return;
             }
-
-            String targetName = args[0];
-            OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(targetName);
-
-            if (!targetPlayer.hasPlayedBefore()) {
-                sender.sendMessage(prefix + localeManager.getLocaleMessage("player-not-found").replace("{player}", targetName));
-                return;
-            }
-
-            UUID targetUUID = targetPlayer.getUniqueId();
-            boolean trackTime = targetPlayer.isOnline() && targetPlayer.getPlayer().hasPermission("coldtracker.tracktime");
-            boolean trackVotes = targetPlayer.isOnline() && targetPlayer.getPlayer().hasPermission("coldtracker.trackvote");
-
-            if (!trackTime && !trackVotes) {
-                sender.sendMessage(prefix + localeManager.getLocaleMessage("no-staff-member").replace("{player}", targetName));
-                return;
-            }
-
-            showStats(plugin, localeManager, sender, targetUUID, targetPlayer.getName());
         } else {
             sender.sendMessage(prefix + localeManager.getLocaleMessage("invalid-command-usage"));
         }
     }
+
 
     private void showStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName) {
         String prefix = localeManager.getLocaleMessage("prefix");
@@ -90,15 +86,37 @@ public class StatsCommand extends BaseCommand {
         hours = hours % 24;
         String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
 
-        String statsMessage = prefix + localeManager.getLocaleMessage("command-stats-playtime").replace("{time}", timeFormatted);
+        StringBuilder statsMessage = new StringBuilder();
 
-        if (plugin.getConfig().getBoolean("track-votes", false)) {
-            int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
-            statsMessage += " " + localeManager.getLocaleMessage("command-stats-votes").replace("{votes}", String.valueOf(totalVotes));
+        boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false);
+        int totalVotes = trackVotes ? plugin.getDatabaseManager().getTotalVotes(playerUUID) : 0;
+
+        // Dacă targetul este senderul
+        if (sender instanceof Player && ((Player) sender).getUniqueId().equals(playerUUID)) {
+            String playtimeMessage = localeManager.getLocaleMessage("command-stats-playtime").replace("{time}", timeFormatted);
+            // Eliminăm punctul doar dacă voturile sunt trackate
+            if (trackVotes) {
+                playtimeMessage = playtimeMessage.endsWith(".") ? playtimeMessage.substring(0, playtimeMessage.length() - 1) : playtimeMessage;
+            }
+            statsMessage.append(prefix).append(playtimeMessage);
+        } else {
+            String playtimeMessage = localeManager.getLocaleMessage("showtime-message").replace("{player}", playerName).replace("{time}", timeFormatted);
+            // Eliminăm punctul doar dacă voturile sunt trackate
+            if (trackVotes) {
+                playtimeMessage = playtimeMessage.endsWith(".") ? playtimeMessage.substring(0, playtimeMessage.length() - 1) : playtimeMessage;
+            }
+            statsMessage.append(prefix).append(playtimeMessage);
         }
 
-        sender.sendMessage(statsMessage);
+        // Adăugăm voturile doar dacă sunt trackate
+        if (trackVotes) {
+            statsMessage.append(" ").append(localeManager.getLocaleMessage("command-stats-votes").replace("{votes}", String.valueOf(totalVotes)));
+        }
+
+        sender.sendMessage(statsMessage.toString());
     }
+
+
 
     @Override
     public List<String> tabComplete(@NotNull ColdTracker plugin, @NotNull CommandSender sender, @NotNull String[] args) {
