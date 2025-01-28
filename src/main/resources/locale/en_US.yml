@@ -23,6 +23,13 @@ showvotes-message: "&c{player} &7has a total of &c{votes}&7 votes."
 command-showvotes-disabled: '&7Vote tracker &cdisabled&7. Please consult configuration file.'
 command-votes-not-available: '&7Voting plugin not detected. Vote tracking is &cunavailable&7.'
 
+# Stats Command
+command-stats-description: '&8 - &c/coldtracker stats &7- View your personal stats'
+command-stats-player-only: '&cOnly players can use this command.'
+command-stats-console-only: '&7Console can''t have stats.'
+command-stats-playtime: '&7You have a total time of &c{time}&7.'
+command-stats-votes: '&7and &c{votes} votes&7.'
+
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Wipe current SQLite database'
 command-wipe-usage: '&7Usage: &c/coldtracker wipe'
