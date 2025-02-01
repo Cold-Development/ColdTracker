@@ -32,7 +32,7 @@ public class ExportCommand extends BaseCommand {
             LocaleManager localeManager = plugin.getManager(LocaleManager.class);
             LuckPerms luckPerms = plugin.getLuckPerms();
 
-            String folderName = plugin.getConfig().getString("folder-name", "exported database");
+            String folderName = plugin.getConfig().getString("folder-name", "exported-database");
             File folder = new File(plugin.getDataFolder(), folderName);
             if (!folder.exists()) {
                 folder.mkdirs();
@@ -71,30 +71,36 @@ public class ExportCommand extends BaseCommand {
                     userFuture.thenAccept(user -> {
                         if (user != null && user.getCachedData().getPermissionData().checkPermission("coldtracker.tracktime").asBoolean()) {
                             UUID playerUUID = player.getUniqueId();
-                            long totalTime = plugin.getDatabaseManager().getTotalTime(playerUUID);
-                            long hours = (totalTime / 1000) / 3600;
-                            long minutes = ((totalTime / 1000) % 3600) / 60;
-                            long seconds = (totalTime / 1000) % 60;
 
-                            long days = hours / 24;
-                            hours = hours % 24;
-                            String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+                            CompletableFuture<Long> timeFuture = plugin.getDatabaseManager().getTotalTimeAsync(playerUUID);
+                            CompletableFuture<Integer> votesFuture = plugin.getDatabaseManager().getTotalVotesAsync(playerUUID);
 
-                            StringBuilder exportLine = new StringBuilder();
-                            exportLine.append(player.getName()).append(" has a total time of ").append(timeFormatted);
+                            CompletableFuture.allOf(timeFuture, votesFuture).thenRun(() -> {
+                                long totalTime = timeFuture.join();
+                                int totalVotes = votesFuture.join();
 
-                            if (trackVotes && user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
-                                int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
-                                exportLine.append(" and ").append(totalVotes).append(" votes");
-                            }
+                                long hours = (totalTime / 1000) / 3600;
+                                long minutes = ((totalTime / 1000) % 3600) / 60;
+                                long seconds = (totalTime / 1000) % 60;
+                                long days = hours / 24;
+                                hours = hours % 24;
+                                String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
 
-                            exportLine.append(".\n");
+                                StringBuilder exportLine = new StringBuilder();
+                                exportLine.append(player.getName()).append(" has a total time of ").append(timeFormatted);
 
-                            try {
-                                writer.write(exportLine.toString());
-                            } catch (IOException e) {
-                                plugin.getLogger().severe("Failed to write player data to " + file.getName() + ": " + e.getMessage());
-                            }
+                                if (trackVotes && user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
+                                    exportLine.append(" and ").append(totalVotes).append(" votes");
+                                }
+
+                                exportLine.append(".\n");
+
+                                try {
+                                    writer.write(exportLine.toString());
+                                } catch (IOException e) {
+                                    plugin.getLogger().severe("Failed to write player data to " + file.getName() + ": " + e.getMessage());
+                                }
+                            }).join();
                         }
                     }).join();
                 }
