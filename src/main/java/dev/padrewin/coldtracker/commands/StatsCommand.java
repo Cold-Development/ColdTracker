@@ -73,38 +73,44 @@ public class StatsCommand extends BaseCommand {
 
     private void showStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName, boolean isSelf) {
         String prefix = localeManager.getLocaleMessage("prefix");
-        long totalTime = plugin.getDatabaseManager().getTotalTime(playerUUID);
-        long hours = (totalTime / 1000) / 3600;
-        long minutes = ((totalTime / 1000) % 3600) / 60;
-        long seconds = (totalTime / 1000) % 60;
-        long days = hours / 24;
-        hours = hours % 24;
-        String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
 
-        StringBuilder statsMessage = new StringBuilder();
+        plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
+            long hours = (totalTime / 1000) / 3600;
+            long minutes = ((totalTime / 1000) % 3600) / 60;
+            long seconds = (totalTime / 1000) % 60;
+            long days = hours / 24;
+            hours = hours % 24;
+            String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
 
-        statsMessage.append(" \n");
+            StringBuilder statsMessage = new StringBuilder();
+            statsMessage.append(" \n");
 
-        if (isSelf) {
-            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-self-title")).append("\n");
-        } else {
-            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-other-title").replace("{player}", playerName)).append("\n");
-        }
+            if (isSelf) {
+                statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-self-title")).append("\n");
+            } else {
+                statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-other-title").replace("{player}", playerName)).append("\n");
+            }
 
-        statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)).append("\n");
+            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)).append("\n");
 
-        if (plugin.getConfig().getBoolean("track-votes", false)) {
-            int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
-            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-votes-prefix").replace("{votes}", String.valueOf(totalVotes))).append("\n");
-        }
+            if (plugin.getConfig().getBoolean("track-votes", false)) {
+                plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
+                    statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-votes-prefix").replace("{votes}", String.valueOf(totalVotes))).append("\n");
+                    statsMessage.append(" \n");
 
-        statsMessage.append(" \n");
+                    for (String line : statsMessage.toString().split("\n")) {
+                        sender.sendMessage(line.isEmpty() ? " " : line);
+                    }
+                });
+            } else {
+                statsMessage.append(" \n");
 
-        for (String line : statsMessage.toString().split("\n")) {
-            sender.sendMessage(line.isEmpty() ? " " : line);
-        }
+                for (String line : statsMessage.toString().split("\n")) {
+                    sender.sendMessage(line.isEmpty() ? " " : line);
+                }
+            }
+        });
     }
-
 
     @Override
     public List<String> tabComplete(@NotNull ColdTracker plugin, @NotNull CommandSender sender, @NotNull String[] args) {
