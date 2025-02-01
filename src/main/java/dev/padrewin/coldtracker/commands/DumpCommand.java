@@ -72,82 +72,94 @@ public class DumpCommand extends BaseCommand {
 
             gistContent.append("\n");
 
-            boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false); // Verificăm dacă voturile sunt activate
+            boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false);
+
+            List<CompletableFuture<String>> futures = new ArrayList<>();
 
             for (OfflinePlayer player : playersWithPermission) {
                 UUID playerUUID = player.getUniqueId();
-                long totalTime = plugin.getDatabaseManager().getTotalTime(playerUUID);
-                long hours = (totalTime / 1000) / 3600;
-                long minutes = ((totalTime / 1000) % 3600) / 60;
-                long seconds = (totalTime / 1000) % 60;
 
-                long days = hours / 24;
-                hours = hours % 24;
-                String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+                CompletableFuture<Long> timeFuture = plugin.getDatabaseManager().getTotalTimeAsync(playerUUID);
+                CompletableFuture<Integer> votesFuture = plugin.getDatabaseManager().getTotalVotesAsync(playerUUID);
 
-                StringBuilder playerData = new StringBuilder();
-                playerData.append(player.getName()).append(" has played for ").append(timeFormatted);
+                CompletableFuture<String> playerDataFuture = CompletableFuture.allOf(timeFuture, votesFuture).thenApply(v -> {
+                    long totalTime = timeFuture.join();
+                    int totalVotes = votesFuture.join();
 
-                // Adăugăm voturile doar dacă track-votes este activ și jucătorul are permisiunea
-                if (trackVotes) {
-                    CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
-                    userFuture.thenAccept(user -> {
-                        if (user != null && user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
-                            int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
+                    long hours = (totalTime / 1000) / 3600;
+                    long minutes = ((totalTime / 1000) % 3600) / 60;
+                    long seconds = (totalTime / 1000) % 60;
+                    long days = hours / 24;
+                    hours = hours % 24;
+                    String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+
+                    StringBuilder playerData = new StringBuilder();
+                    playerData.append(player.getName()).append(" has played for ").append(timeFormatted);
+
+                    if (trackVotes) {
+                        CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
+                        if (userFuture.join().getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
                             playerData.append(" and ").append(totalVotes).append(" votes");
                         }
-                    }).join();
-                }
-
-                playerData.append(".\n");
-                gistContent.append(playerData);
-            }
-
-            HttpURLConnection connection = null;
-            try {
-                String gistToken = plugin.getConfig().getString(SettingKey.GIST_TOKEN.getKey());
-                if (gistToken == null || gistToken.isEmpty()) {
-                    plugin.getLogger().severe("No GitHub token found in config.yml!");
-                    Bukkit.getScheduler().runTask(plugin, () -> localeManager.sendMessage(sender, "command-dump-fail"));
-                    return;
-                }
-
-                GitHubGistClient gistClient = new GitHubGistClient(gistToken);
-
-                // Prefix din config și formatarea datei pentru numele fișierului
-                String filePrefix = plugin.getConfig().getString(SettingKey.FILE_PREFIX.getKey(), "staff_activity_");
-                LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm");
-                String formattedDateTime = now.format(formatter);
-                String gistFileName = filePrefix + formattedDateTime + ".yml";
-
-                String gistUrl = gistClient.createGist(gistContent.toString(), gistFileName, false);
-
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    String prefix = localeManager.getLocaleMessage("prefix");
-                    String successMessage = prefix + localeManager.getLocaleMessage("command-dump-success").replace("{link}", gistUrl);
-                    sender.sendMessage(successMessage);
-                });
-
-            } catch (Exception e) {
-                plugin.getLogger().severe("Failed to post to GitHub Gist: " + e.getMessage());
-
-                if (e instanceof IOException && connection != null) {
-                    try (Scanner scanner = new Scanner(connection.getErrorStream(), StandardCharsets.UTF_8)) {
-                        while (scanner.hasNext()) {
-                            plugin.getLogger().severe("GitHub Gist API Error: " + scanner.nextLine());
-                        }
-                    } catch (Exception ex) {
-                        plugin.getLogger().severe("Failed to read GitHub Gist API error response: " + ex.getMessage());
                     }
+
+                    playerData.append(".\n");
+                    return playerData.toString();
+                });
+
+                futures.add(playerDataFuture);
+            }
+
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
+                for (CompletableFuture<String> future : futures) {
+                    gistContent.append(future.join());
                 }
 
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    String prefix = localeManager.getLocaleMessage("prefix");
-                    String failMessage = prefix + localeManager.getLocaleMessage("command-dump-fail");
-                    sender.sendMessage(failMessage);
-                });
-            }
+                HttpURLConnection connection = null;
+                try {
+                    String gistToken = plugin.getConfig().getString(SettingKey.GIST_TOKEN.getKey());
+                    if (gistToken == null || gistToken.isEmpty()) {
+                        plugin.getLogger().severe("No GitHub token found in config.yml!");
+                        Bukkit.getScheduler().runTask(plugin, () -> localeManager.sendMessage(sender, "command-dump-fail"));
+                        return;
+                    }
+
+                    GitHubGistClient gistClient = new GitHubGistClient(gistToken);
+
+                    String filePrefix = plugin.getConfig().getString(SettingKey.FILE_PREFIX.getKey(), "staff_activity_");
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm");
+                    String formattedDateTime = now.format(formatter);
+                    String gistFileName = filePrefix + formattedDateTime + ".yml";
+
+                    String gistUrl = gistClient.createGist(gistContent.toString(), gistFileName, false);
+
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        String prefix = localeManager.getLocaleMessage("prefix");
+                        String successMessage = prefix + localeManager.getLocaleMessage("command-dump-success").replace("{link}", gistUrl);
+                        sender.sendMessage(successMessage);
+                    });
+
+                } catch (Exception e) {
+                    plugin.getLogger().severe("Failed to post to GitHub Gist: " + e.getMessage());
+
+                    if (e instanceof IOException && connection != null) {
+                        try (Scanner scanner = new Scanner(connection.getErrorStream(), StandardCharsets.UTF_8)) {
+                            while (scanner.hasNext()) {
+                                plugin.getLogger().severe("GitHub Gist API Error: " + scanner.nextLine());
+                            }
+                        } catch (Exception ex) {
+                            plugin.getLogger().severe("Failed to read GitHub Gist API error response: " + ex.getMessage());
+                        }
+                    }
+
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        String prefix = localeManager.getLocaleMessage("prefix");
+                        String failMessage = prefix + localeManager.getLocaleMessage("command-dump-fail");
+                        sender.sendMessage(failMessage);
+                    });
+                }
+            });
         });
     }
 
