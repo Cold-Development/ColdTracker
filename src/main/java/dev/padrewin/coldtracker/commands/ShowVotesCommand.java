@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
 import net.luckperms.api.LuckPerms;
 
 public class ShowVotesCommand extends BaseCommand {
@@ -57,10 +56,9 @@ public class ShowVotesCommand extends BaseCommand {
         }
 
         UUID playerUUID = targetPlayer.getUniqueId();
-
         LuckPerms luckPerms = plugin.getLuckPerms();
-        CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
 
+        CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
         userFuture.thenAccept(user -> {
             if (user != null) {
                 boolean hasPermission = user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean();
@@ -71,13 +69,14 @@ public class ShowVotesCommand extends BaseCommand {
                     return;
                 }
 
-                int totalVotes = plugin.getDatabaseManager().getTotalVotes(playerUUID);
-
-                String prefix = localeManager.getLocaleMessage("prefix");
-                String message = prefix + localeManager.getLocaleMessage("showvotes-message")
-                        .replace("{player}", targetPlayer.getName() != null ? targetPlayer.getName() : playerName)
-                        .replace("{votes}", String.valueOf(totalVotes));
-                sender.sendMessage(message);
+                // 🔥 Modificare: apelăm `getTotalVotesAsync` și folosim `.thenAccept()` pentru a obține valoarea voturilor
+                plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
+                    String prefix = localeManager.getLocaleMessage("prefix");
+                    String message = prefix + localeManager.getLocaleMessage("showvotes-message")
+                            .replace("{player}", targetPlayer.getName() != null ? targetPlayer.getName() : playerName)
+                            .replace("{votes}", String.valueOf(totalVotes));
+                    sender.sendMessage(message);
+                });
             } else {
                 sender.sendMessage(localeManager.getLocaleMessage("player-not-found").replace("{player}", playerName));
             }
