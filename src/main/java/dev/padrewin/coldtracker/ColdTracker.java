@@ -13,14 +13,14 @@ import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.manager.LocaleManager;
 import dev.padrewin.coldtracker.setting.SettingKey;
 import net.luckperms.api.LuckPerms;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import static dev.padrewin.colddev.manager.AbstractDataManager.*;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public final class ColdTracker extends ColdPlugin {
 
@@ -61,6 +61,9 @@ public final class ColdTracker extends ColdPlugin {
         String databasePath = connector.getDatabasePath();
         getLogger().info(ANSI_GREEN + "Database path: " + ANSI_YELLOW + databasePath + ANSI_RESET);
 
+        // Cleanup last join sessions
+        databaseManager.cleanupStaleSessions();
+
         // Initialize time tracking event listener
         getServer().getPluginManager().registerEvents(new PlayerTrackingListener(this), this);
 
@@ -94,13 +97,46 @@ public final class ColdTracker extends ColdPlugin {
 
     @Override
     public void disable() {
+        getLogger().info("[DEBUG] Processing remaining playtime before shutdown...");
+
         if (databaseManager != null) {
-            databaseManager.closeConnection();
+            List<CompletableFuture<Void>> tasks = new ArrayList<>();
+
+            if (!Bukkit.getOnlinePlayers().isEmpty()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.hasPermission("coldtracker.tracktime")) {
+                        CompletableFuture<Void> task = databaseManager.removeJoinTimeAsync(player.getUniqueId())
+                                .exceptionally(ex -> {
+                                    getLogger().severe("[ERROR] Failed to remove join time for " + player.getName() + ": " + ex.getMessage());
+                                    return null;
+                                });
+                        tasks.add(task);
+                    }
+                }
+            }
+
+            if (!tasks.isEmpty()) {
+                CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).thenRun(() -> {
+                    databaseManager.closeConnection();
+                    getLogger().info("");
+                    getLogger().info("[DEBUG] Database connection closed successfully.");
+                    getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
+                    getLogger().info("");
+                });
+            } else {
+                databaseManager.closeConnection();
+                getLogger().info("");
+                getLogger().info("[DEBUG] No active players to process, database closed immediately.");
+                getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
+                getLogger().info("");
+            }
+        } else {
+            getLogger().info("");
+            getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
+            getLogger().info("");
         }
-        getLogger().info("");
-        getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
-        getLogger().info("");
     }
+
 
     @Override
     public void reload() {
