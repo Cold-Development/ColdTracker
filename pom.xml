@@ -6,7 +6,7 @@
 
     <groupId>dev.padrewin</groupId>
     <artifactId>coldtracker</artifactId>
-    <version>1.4</version>
+    <version>1.4.1</version>
     <packaging>jar</packaging>
 
     <name>ColdTracker</name>
@@ -102,7 +102,7 @@
         <dependency>
             <groupId>dev.padrewin</groupId>
             <artifactId>colddev</artifactId>
-            <version>1.4.8</version>
+            <version>1.4.9</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
