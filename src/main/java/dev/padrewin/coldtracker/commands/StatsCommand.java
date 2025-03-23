@@ -75,12 +75,32 @@ public class StatsCommand extends BaseCommand {
         String prefix = localeManager.getLocaleMessage("prefix");
 
         plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
-            long hours = (totalTime / 1000) / 3600;
-            long minutes = ((totalTime / 1000) % 3600) / 60;
-            long seconds = (totalTime / 1000) % 60;
-            long days = hours / 24;
-            hours = hours % 24;
-            String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+            long totalSeconds = totalTime / 1000;
+
+            long days = totalSeconds / 86400;
+            long remaining = totalSeconds % 86400;
+
+            long hours = remaining / 3600;
+            remaining %= 3600;
+
+            long minutes = remaining / 60;
+            long seconds = remaining % 60;
+
+            StringBuilder sb = new StringBuilder();
+            if (days > 0) {
+                sb.append(days).append("d ");
+            }
+            if (hours > 0) {
+                sb.append(hours).append("h ");
+            }
+            if (minutes > 0) {
+                sb.append(minutes).append("m ");
+            }
+            if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+                sb.append(seconds).append("s");
+            }
+
+            String timeFormatted = sb.toString().trim();
 
             StringBuilder statsMessage = new StringBuilder();
             statsMessage.append(" \n");
@@ -88,14 +108,21 @@ public class StatsCommand extends BaseCommand {
             if (isSelf) {
                 statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-self-title")).append("\n");
             } else {
-                statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-other-title").replace("{player}", playerName)).append("\n");
+                statsMessage.append(prefix).append(
+                        localeManager.getLocaleMessage("command-stats-other-title").replace("{player}", playerName)
+                ).append("\n");
             }
 
-            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)).append("\n");
+            statsMessage.append(prefix).append(
+                    localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)
+            ).append("\n");
 
             if (plugin.getConfig().getBoolean("track-votes", false)) {
                 plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
-                    statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-votes-prefix").replace("{votes}", String.valueOf(totalVotes))).append("\n");
+                    statsMessage.append(prefix).append(
+                            localeManager.getLocaleMessage("command-stats-votes-prefix")
+                                    .replace("{votes}", String.valueOf(totalVotes))
+                    ).append("\n");
                     statsMessage.append(" \n");
 
                     for (String line : statsMessage.toString().split("\n")) {
@@ -111,6 +138,7 @@ public class StatsCommand extends BaseCommand {
             }
         });
     }
+
 
     @Override
     public List<String> tabComplete(@NotNull ColdTracker plugin, @NotNull CommandSender sender, @NotNull String[] args) {
