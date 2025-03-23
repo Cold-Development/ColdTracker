@@ -79,18 +79,42 @@ public class ExportCommand extends BaseCommand {
                                 long totalTime = timeFuture.join();
                                 int totalVotes = votesFuture.join();
 
-                                long hours = (totalTime / 1000) / 3600;
-                                long minutes = ((totalTime / 1000) % 3600) / 60;
-                                long seconds = (totalTime / 1000) % 60;
-                                long days = hours / 24;
-                                hours = hours % 24;
-                                String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+                                long totalSeconds = totalTime / 1000;
+
+                                long days = totalSeconds / 86400;
+                                long remaining = totalSeconds % 86400;
+
+                                long hours = remaining / 3600;
+                                remaining %= 3600;
+
+                                long minutes = remaining / 60;
+                                long seconds = remaining % 60;
+
+                                StringBuilder sbTime = new StringBuilder();
+                                if (days > 0) {
+                                    sbTime.append(days).append("d ");
+                                }
+                                if (hours > 0) {
+                                    sbTime.append(hours).append("h ");
+                                }
+                                if (minutes > 0) {
+                                    sbTime.append(minutes).append("m ");
+                                }
+                                if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+                                    sbTime.append(seconds).append("s");
+                                }
+
+                                String timeFormatted = sbTime.toString().trim();
 
                                 StringBuilder exportLine = new StringBuilder();
-                                exportLine.append(player.getName()).append(" has a total time of ").append(timeFormatted);
+                                exportLine.append(player.getName())
+                                        .append(" has a total time of ")
+                                        .append(timeFormatted);
 
                                 if (trackVotes && user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
-                                    exportLine.append(" and ").append(totalVotes).append(" votes");
+                                    exportLine.append(" and has ")
+                                            .append(totalVotes)
+                                            .append(" votes");
                                 }
 
                                 exportLine.append(".\n");
