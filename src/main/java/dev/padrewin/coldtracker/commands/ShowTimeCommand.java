@@ -61,14 +61,34 @@ public class ShowTimeCommand extends BaseCommand {
                 }
 
                 plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
-                    long hours = (totalTime / 1000) / 3600;
-                    long minutes = ((totalTime / 1000) % 3600) / 60;
-                    long seconds = (totalTime / 1000) % 60;
-                    long days = hours / 24;
-                    hours = hours % 24;
+                    long totalSeconds = totalTime / 1000;
+
+                    long days = totalSeconds / 86400;
+                    long remaining = totalSeconds % 86400;
+
+                    long hours = remaining / 3600;
+                    remaining %= 3600;
+
+                    long minutes = remaining / 60;
+                    long seconds = remaining % 60;
+
+                    StringBuilder sb = new StringBuilder();
+                    if (days > 0) {
+                        sb.append(days).append("d ");
+                    }
+                    if (hours > 0) {
+                        sb.append(hours).append("h ");
+                    }
+                    if (minutes > 0) {
+                        sb.append(minutes).append("m ");
+                    }
+                    if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+                        sb.append(seconds).append("s");
+                    }
+
+                    String timeFormatted = sb.toString().trim();
 
                     String prefix = localeManager.getLocaleMessage("prefix");
-                    String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
                     String message = prefix + localeManager.getLocaleMessage("showtime-message")
                             .replace("{player}", targetPlayer.getName() != null ? targetPlayer.getName() : playerName)
                             .replace("{time}", timeFormatted);
