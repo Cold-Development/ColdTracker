@@ -86,12 +86,32 @@ public class DumpCommand extends BaseCommand {
                     long totalTime = timeFuture.join();
                     int totalVotes = votesFuture.join();
 
-                    long hours = (totalTime / 1000) / 3600;
-                    long minutes = ((totalTime / 1000) % 3600) / 60;
-                    long seconds = (totalTime / 1000) % 60;
-                    long days = hours / 24;
-                    hours = hours % 24;
-                    String timeFormatted = String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+                    long totalSeconds = totalTime / 1000;
+
+                    long days = totalSeconds / 86400;
+                    long remaining = totalSeconds % 86400;
+
+                    long hours = remaining / 3600;
+                    remaining %= 3600;
+
+                    long minutes = remaining / 60;
+                    long seconds = remaining % 60;
+
+                    StringBuilder sb = new StringBuilder();
+                    if (days > 0) {
+                        sb.append(days).append("d ");
+                    }
+                    if (hours > 0) {
+                        sb.append(hours).append("h ");
+                    }
+                    if (minutes > 0) {
+                        sb.append(minutes).append("m ");
+                    }
+                    if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+                        sb.append(seconds).append("s");
+                    }
+
+                    String timeFormatted = sb.toString().trim();
 
                     StringBuilder playerData = new StringBuilder();
                     playerData.append(player.getName()).append(" has played for ").append(timeFormatted);
@@ -99,7 +119,9 @@ public class DumpCommand extends BaseCommand {
                     if (trackVotes) {
                         CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
                         if (userFuture.join().getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
-                            playerData.append(" and ").append(totalVotes).append(" votes");
+                            playerData.append(" and has ")
+                                    .append(totalVotes)
+                                    .append(" votes");
                         }
                     }
 
