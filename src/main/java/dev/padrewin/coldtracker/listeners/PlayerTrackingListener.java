@@ -24,7 +24,7 @@ public class PlayerTrackingListener implements Listener {
             UUID playerUUID = player.getUniqueId();
             long joinTime = System.currentTimeMillis();
 
-            plugin.getDatabaseManager().logJoinTime(playerUUID, player.getName(), joinTime);
+            plugin.getStorageHandler().logJoinTime(playerUUID, player.getName(), joinTime);
 
             if (plugin.getConfig().getBoolean("debug", false)) {
                 plugin.getLogger().info("[DEBUG] Player " + player.getName() + " joined. Logged join_time: " + joinTime);
@@ -42,7 +42,7 @@ public class PlayerTrackingListener implements Listener {
         if (player.hasPermission("coldtracker.tracktime")) {
             UUID playerUUID = player.getUniqueId();
 
-            plugin.getDatabaseManager().removeJoinTimeAsync(playerUUID);
+            plugin.getStorageHandler().removeJoinTimeAsync(playerUUID);
 
             if (plugin.getConfig().getBoolean("debug", false)) {
                 plugin.getLogger().info("[DEBUG] Player " + player.getName() + " quit. Processed session time.");

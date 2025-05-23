@@ -70,7 +70,7 @@ public class ShowVotesCommand extends BaseCommand {
                 }
 
                 // 🔥 Modificare: apelăm `getTotalVotesAsync` și folosim `.thenAccept()` pentru a obține valoarea voturilor
-                plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
+                plugin.getStorageHandler().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
                     String prefix = localeManager.getLocaleMessage("prefix");
                     String message = prefix + localeManager.getLocaleMessage("showvotes-message")
                             .replace("{player}", targetPlayer.getName() != null ? targetPlayer.getName() : playerName)

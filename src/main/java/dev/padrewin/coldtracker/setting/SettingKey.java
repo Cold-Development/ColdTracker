@@ -51,6 +51,46 @@ public class SettingKey {
             "The name of the folder where exported files will be saved.",
             "If left blank, it will default to 'exported database'.");
 
+    // SERVER CONFIGURATION
+    public static final ColdSetting<String> SERVER_NAME = create("server.name", STRING, "auto",
+            "The display name for this server.",
+            "This will be used in stats displays and exports.",
+            "Examples: 'Survival', 'Creative', 'Skyblock', 'Hub', etc.",
+            "If set to 'auto', it will try to detect the server name automatically.");
+
+    public static final ColdSetting<String> SERVER_NAME_DETECTION = create("server.name-detection", STRING, "folder",
+            "How to automatically detect the server name when SERVER_NAME is set to 'auto':",
+            "- 'world': Use the first world's name",
+            "- 'jar': Use the jar file name",
+            "- 'folder': Use the server folder name",
+            "- 'config': Use the value from SERVER_NAME setting (ignores auto detection)");
+
+    // STORAGE OPTIONS
+    public static final ColdSetting<String> STORAGE_TYPE = create("storage.type", STRING, "sqlite", "The type of storage to use: 'sqlite' or 'mysql'.");
+
+    public static final ColdSetting<String> MYSQL_HOST = create("storage.mysql.host", STRING, "localhost", "MySQL host.");
+    public static final ColdSetting<Integer> MYSQL_PORT = create("storage.mysql.port", INTEGER, 3306, "MySQL port.");
+    public static final ColdSetting<String> MYSQL_DATABASE = create("storage.mysql.database", STRING, "coldtracker", "MySQL database name.");
+    public static final ColdSetting<String> MYSQL_USERNAME = create("storage.mysql.username", STRING, "root", "MySQL username.");
+    public static final ColdSetting<String> MYSQL_PASSWORD = create("storage.mysql.password", STRING, "password", "MySQL password.");
+
+    // ROTATION OPTIONS (Updated)
+    public static final ColdSetting<Boolean> ROTATION_ENABLED = create("rotation.enabled", BOOLEAN, false, "Enable automatic monthly or weekly data rotation/export.");
+    public static final ColdSetting<String> ROTATION_FREQUENCY = create("rotation.frequency", STRING, "monthly", "Can be 'monthly' or 'weekly'.");
+    public static final ColdSetting<Integer> ROTATION_START_DAY = create("rotation.start-day", INTEGER, 1,
+            "Day to start the rotation.",
+            "For monthly: 1-31 (day of month)",
+            "For weekly: 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday, 7=Sunday",
+            "Examples: start-day: 1 (monthly = 1st of month, weekly = Monday)",
+            "          start-day: 5 (monthly = 5th of month, weekly = Friday)");
+    public static final ColdSetting<Boolean> ROTATION_CLEAN_AFTER = create("rotation.clean-after-export", BOOLEAN, true, "If true, the database is cleared after each export.");
+    public static final ColdSetting<Boolean> ROTATION_SEND_TO_DISCORD = create("rotation.send-to-discord", BOOLEAN, false, "If true, rotation exports are automatically sent to Discord webhook.");
+    public static final ColdSetting<Boolean> ROTATION_SAVE_LOCAL = create("rotation.save-local", BOOLEAN, true, "If true, rotation exports are saved locally in the export folder.");
+
+    // DISCORD WEBHOOK
+    public static final ColdSetting<String> DISCORD_WEBHOOK = create("discord-webhook", STRING, "", "Discord webhook URL to send export files to.");
+    public static final ColdSetting<Boolean> SEND_EXPORT_TO_DISCORD = create("send-export-to-discord", BOOLEAN, false, "Whether to send exports to Discord via webhook.");
+
     private static <T> ColdSetting<T> create(String key, ColdSettingSerializer<T> serializer, T defaultValue, String... comments) {
         ColdSetting<T> setting = ColdSetting.backed(ColdTracker.getInstance(), key, serializer, defaultValue, comments);
         KEYS.add(setting);

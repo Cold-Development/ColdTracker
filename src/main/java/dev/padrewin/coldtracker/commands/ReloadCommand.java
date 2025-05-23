@@ -15,19 +15,23 @@ public class ReloadCommand extends BaseCommand {
 
     @Override
     public void execute(ColdTracker plugin, CommandSender sender, String[] args) {
+        LocaleManager locale = plugin.getManager(LocaleManager.class);
+
         if (!sender.hasPermission("coldtracker.reload")) {
-            plugin.getManager(LocaleManager.class).sendMessage(sender, "no-permission");
+            locale.sendMessage(sender, "no-permission");
             return;
         }
 
         if (args.length > 0) {
-            plugin.getManager(LocaleManager.class).sendMessage(sender, "command-reload-usage");
+            locale.sendMessage(sender, "command-reload-usage");
             return;
         }
 
         plugin.reloadConfig();
         plugin.reload();
-        plugin.getManager(LocaleManager.class).sendMessage(sender, "command-reload-success");
+        plugin.setupStorageHandler();
+
+        locale.sendMessage(sender, "command-reload-success");
     }
 
     @Override

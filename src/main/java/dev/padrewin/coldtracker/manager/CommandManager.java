@@ -29,6 +29,7 @@ public class CommandManager extends Manager {
         VERSION,
         DUMP,
         EXPORT,
+        MIGRATE_SERVER_NAME,
         HELP;
 
         private List<String> aliases;

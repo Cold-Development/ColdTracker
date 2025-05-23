@@ -2,63 +2,77 @@
 prefix: '&8「&#635AA7C&#7D72B7o&#978BC7l&#B2A3D8d&#CCBCE8T&#E6D4F8r&#D8B8F8a&#C99CF7c&#BB80F7k&#AC64F6e&#9E48F6r&8」&7» '
 
 # Help Command
-command-help-description: '&8 - &c/coldtracker help &7- Exibe o menu de ajuda... Você chegou'
-command-help-title: '&cComandos Disponíveis:'
+command-help-description: '&8 - &c/coldtracker help &7- Exibe o menu de ajuda... Chegou ao destino'
+command-help-title: '&cComandos disponíveis:'
 
 # Misc
-no-permission: '&cVocê não tem permissão para isso!'
+no-permission: '&cNão tem permissão para isso!'
 unknown-command: '&cComando desconhecido &4%input%&c.'
-invalid-command-usage: '&cUso inválido do comando.'
+invalid-command-usage: '&cUso de comando inválido.'
 player-not-found: '&7Jogador não encontrado: &c{player}&7.'
 
 # Showtime Command Message
-command-showtime-description: '&8 - &c/coldtracker showtime <playername> &7- Mostra o tempo total registrado de um jogador'
-no-staff-member: '&7&c{player} &7não é um membro da equipe.'
-showtime-message: '&c{player} &7jogou por &c{time}&7.'
-command-showtime-usage: '&7Uso: &c/coldtracker showtime <playername>'
+command-showtime-description: '&8 - &c/coldtracker showtime <nomejogador> &7- Mostrar tempo total rastreado do jogador'
+no-staff-member: '&7&c{player} &7não é um membro da equipa.'
+showtime-message: '&c{player} &7jogou durante &c{time}&7.'
+command-showtime-usage: '&7Uso: &c/coldtracker showtime <nomejogador>'
 
 # ShowVote Command Message
-command-showvotes-description: '&8 - &c/coldtracker showvotes <playername> &7- Mostra o total de votos de um jogador'
-showvotes-message: "&c{player} &7tem um total de &c{votes}&7 votos."
-command-showvotes-disabled: '&7O rastreamento de votos está &cdesativado&7. Consulte o arquivo de configuração.'
-command-votes-not-available: '&7Nenhum plugin de votos detectado. O rastreamento de votos está &cindisponível&7.'
+command-showvotes-description: '&8 - &c/coldtracker showvotes <nomejogador> &7- Mostrar total de votos rastreados do jogador'
+showvotes-message: '&c{player} &7tem um total de &c{votes}&7 votos.'
+command-showvotes-disabled: '&7Rastreamento de votos &cdesativado&7. Consulte o ficheiro de configuração.'
+command-votes-not-available: '&7Plugin de votação não detetado. Rastreamento de votos está &cindisponível&7.'
 
 # Stats Command
-command-stats-description: '&8 - &c/coldtracker stats &7- Veja suas estatísticas pessoais'
-command-stats-console-no-self: '&7O console não pode ter estatísticas.'
-command-stats-self-title: '&7Suas estatísticas:'
-command-stats-other-title: '&c{player}&7''s estatísticas:'
-command-stats-playtime-prefix: '• &7Tempo de Jogo: &c{time} 🕓'
+command-stats-description: '&8 - &c/coldtracker stats &7- Ver as suas estatísticas pessoais'
+command-stats-console-no-self: '&7A consola não pode ter estatísticas.'
+command-stats-self-title: '&7As suas estatísticas:'
+command-stats-other-title: '&7Estatísticas de &c{player}&7:'
+command-stats-playtime-prefix: '• &7Tempo de jogo: &c{time} 🕓'
 command-stats-votes-prefix: '• &7Votos: &c{votes} 📩'
+command-stats-total-header: '• &7Tempo total por servidor:'
+command-stats-total-server-line: '   &8- &f{server}&7: &c{time}'
+command-stats-total-combined: '• &7Tempo global: &b{time}'
 
 # Database message warnings
-command-wipe-description: '&8 - &c/coldtracker wipe &7- Apaga o banco de dados SQLite atual'
+command-wipe-description: '&8 - &c/coldtracker wipe &7- Limpar base de dados SQLite atual'
 command-wipe-usage: '&7Uso: &c/coldtracker wipe'
-command-wipe-warning: '&eAVISO: &cEsta operação excluirá todos os dados do banco de dados ativo. &cSe você tiver certeza absoluta, use &a/coldtracker wipe confirm&c.'
-command-wipe-success: '&7Todos os dados do banco de dados foram apagados &com sucesso&7.'
+command-wipe-warning: '&eAVISO: &cEsta operação eliminará todos os dados da base de dados ativa. &cSe tem a certeza absoluta, use &a/coldtracker wipe confirm&c.'
+command-wipe-success: '&7Todos os dados da base de dados foram limpos &ccom sucesso&7.'
 
 # Base Command Message
 base-command-color: '&7'
-base-command-help: '&7Use &c/coldtracker help &7para informações sobre os comandos.'
+base-command-help: '&7Use &c/coldtracker help &7para informações sobre comandos.'
 
 # Reload Command
 command-reload-description: '&8 - &c/coldtracker reload &7- Recarrega o plugin'
 command-reload-usage: '&7Uso: &c/coldtracker reload'
-command-reload-success: '&7Os arquivos de configuração e localização foram recarregados.'
+command-reload-success: '&7Configuração e ficheiros de idioma recarregados.'
 
 # Dump Command
-command-dump-disabled: '&7Dump Gist &cdesativado&7. Consulte o arquivo de configuração.'
-command-dump-description: '&8 - &c/coldtracker dump &7- Exporta os dados do banco de dados atual para Gist'
+command-dump-disabled: '&7Dump Gist &cdesativado&7. Consulte o ficheiro de configuração.'
+command-dump-description: '&8 - &c/coldtracker dump &7- Exportar dados da base de dados atual no Gist'
 command-dump-usage: '&7Uso: &c/coldtracker dump'
-command-dump-warning: '&eAVISO: &cEsta operação exportará os dados do banco de dados atual. Use &a/coldtracker dump confirm&c para continuar.'
-command-dump-success: '&7Dump do banco de dados &realizado com sucesso&7! Link: &a{link}'
-command-dump-fail: '&cNão foi possível gerar o link Gist. Consulte o console para mais erros.'
+command-dump-warning: '&eAVISO: &cEsta operação irá exportar os dados da base de dados atual. Use &a/coldtracker dump confirm&c para prosseguir.'
+command-dump-success: '&7Exportação da base de dados &cbem-sucedida&7! Link: &a{link}'
+command-dump-fail: '&cFalha ao gerar link Gist. Verifique a consola para erros.'
+
+# Server Migration Command
+command-migrate-server-name-description: '&8 - &c/coldtracker migrate-server-name &7- Migrar registos de nome de servidor na base de dados'
+command-migrate-server-name-usage: '&7Uso: &c/coldtracker migrate-server-name <nome-antigo> <nome-novo>'
+command-migrate-server-name-same-error: '&cO nome de servidor antigo e novo não podem ser iguais!'
+command-migrate-server-name-start: '&6Iniciando migração de nome de servidor de &c{old} &6para &a{new}&6...'
+command-migrate-server-name-success: '&7Migração bem-sucedida de &a{records} &7registos de &c{old} &7para &a{new}&7!'
+command-migrate-server-name-no-records: '&cNenhum registo encontrado com nome de servidor &4{old}&c.'
 
 # Export Command
 command-export-description: '&8 - &c/coldtracker export &7- Exporta os dados para plugins/ColdTracker'
-command-export-warning: '&eAVISO: &cO arquivo de exportação já existe. Use &a/coldtracker export confirm &cpara sobrescrever.'
-command-export-success: '&7Exportação &realizada com sucesso&7. Os dados foram salvos em &aplugins/ColdTracker/{folder}&7.'
-command-export-fail: '&cNão foi possível salvar export.yml. Consulte o console para erros.'
+command-export-warning: '&eAVISO: &cO ficheiro de exportação já existe. Use &a/coldtracker export confirm &cpara sobrescrever.'
+command-export-success: '&7Exportação &cbem-sucedida&7. Os dados foram guardados em &aplugins/ColdTracker/{folder}&7.'
+command-export-fail: '&cFalha ao guardar export.yml. Verifique a consola para erros.'
+command-export-discord-disabled: '&7Exportação webhook Discord está &cdesativada &7na configuração. Ação cancelada.'
+command-export-discord-success: '&7Exportação &cenviada com sucesso&7 para Discord.'
+command-export-discord-fail: '&cFalha &7ao enviar exportação para Discord.'
 
 # Version Command
-command-version-description: '&8 - &c/coldtracker version &7- Exibe informações da versão para o ColdTracker'
+command-version-description: '&8 - &c/coldtracker version &7- Exibir informações de versão para ColdTracker'

@@ -1,6 +1,7 @@
 package dev.padrewin.coldtracker.commands;
 
 import dev.padrewin.coldtracker.ColdTracker;
+import dev.padrewin.coldtracker.database.MySQLStorageHandler;
 import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.manager.LocaleManager;
 import org.bukkit.Bukkit;
@@ -9,9 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class StatsCommand extends BaseCommand {
 
@@ -73,34 +73,61 @@ public class StatsCommand extends BaseCommand {
 
     private void showStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName, boolean isSelf) {
         String prefix = localeManager.getLocaleMessage("prefix");
+        boolean isMySQL = plugin.getStorageHandler() instanceof MySQLStorageHandler;
 
-        plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
-            long totalSeconds = totalTime / 1000;
+        if (isMySQL) {
+            // MySQL: Show detailed server-by-server stats
+            showMultiServerStats(plugin, localeManager, sender, playerUUID, playerName, isSelf, prefix);
+        } else {
+            // SQLite: Show simple single-server stats
+            showSingleServerStats(plugin, localeManager, sender, playerUUID, playerName, isSelf, prefix);
+        }
+    }
 
-            long days = totalSeconds / 86400;
-            long remaining = totalSeconds % 86400;
+    /**
+     * Show stats for single server (SQLite)
+     */
+    private void showSingleServerStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName, boolean isSelf, String prefix) {
+        plugin.getStorageHandler().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
+            StringBuilder statsMessage = new StringBuilder();
+            statsMessage.append(" \n");
 
-            long hours = remaining / 3600;
-            remaining %= 3600;
-
-            long minutes = remaining / 60;
-            long seconds = remaining % 60;
-
-            StringBuilder sb = new StringBuilder();
-            if (days > 0) {
-                sb.append(days).append("d ");
+            if (isSelf) {
+                statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-self-title")).append("\n");
+            } else {
+                statsMessage.append(prefix).append(
+                        localeManager.getLocaleMessage("command-stats-other-title").replace("{player}", playerName)
+                ).append("\n");
             }
-            if (hours > 0) {
-                sb.append(hours).append("h ");
-            }
-            if (minutes > 0) {
-                sb.append(minutes).append("m ");
-            }
-            if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
-                sb.append(seconds).append("s");
-            }
 
-            String timeFormatted = sb.toString().trim();
+            // Show simple playtime (no server breakdown)
+            statsMessage.append(prefix).append(
+                    localeManager.getLocaleMessage("command-stats-playtime-prefix")
+                            .replace("{time}", formatTime(totalTime))
+            ).append("\n");
+
+            if (plugin.getConfig().getBoolean("track-votes", false)) {
+                plugin.getStorageHandler().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
+                    statsMessage.append(prefix).append(
+                            localeManager.getLocaleMessage("command-stats-votes-prefix")
+                                    .replace("{votes}", String.valueOf(totalVotes))
+                    ).append("\n\n");
+
+                    sendFormatted(statsMessage.toString(), sender);
+                });
+            } else {
+                statsMessage.append(" ");
+                sendFormatted(statsMessage.toString(), sender);
+            }
+        });
+    }
+
+    /**
+     * Show stats for multiple servers (MySQL)
+     */
+    private void showMultiServerStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName, boolean isSelf, String prefix) {
+        plugin.getStorageHandler().getPlaytimeByServer(playerUUID).thenAccept(playtimeMap -> {
+            long totalMillis = 0;
 
             StringBuilder statsMessage = new StringBuilder();
             statsMessage.append(" \n");
@@ -113,32 +140,88 @@ public class StatsCommand extends BaseCommand {
                 ).append("\n");
             }
 
-            statsMessage.append(prefix).append(
-                    localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)
-            ).append("\n");
+            // Only show server breakdown if there are multiple servers
+            if (playtimeMap.size() > 1) {
+                statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-total-header")).append("\n");
+
+                for (Map.Entry<String, Long> entry : playtimeMap.entrySet()) {
+                    String server = entry.getKey();
+                    long millis = entry.getValue();
+                    totalMillis += millis;
+
+                    String timeFormatted = formatTime(millis);
+                    statsMessage.append(prefix).append(
+                            localeManager.getLocaleMessage("command-stats-total-server-line")
+                                    .replace("{server}", server)
+                                    .replace("{time}", timeFormatted)
+                    ).append("\n");
+                }
+
+                statsMessage.append(prefix).append(
+                        localeManager.getLocaleMessage("command-stats-total-combined")
+                                .replace("{time}", formatTime(totalMillis))
+                ).append("\n");
+            } else {
+                // Single server in MySQL - show simple format
+                for (long millis : playtimeMap.values()) {
+                    totalMillis += millis;
+                }
+
+                statsMessage.append(prefix).append(
+                        localeManager.getLocaleMessage("command-stats-playtime-prefix")
+                                .replace("{time}", formatTime(totalMillis))
+                ).append("\n");
+            }
 
             if (plugin.getConfig().getBoolean("track-votes", false)) {
-                plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
+                plugin.getStorageHandler().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
                     statsMessage.append(prefix).append(
                             localeManager.getLocaleMessage("command-stats-votes-prefix")
                                     .replace("{votes}", String.valueOf(totalVotes))
-                    ).append("\n");
-                    statsMessage.append(" \n");
+                    ).append("\n\n");
 
-                    for (String line : statsMessage.toString().split("\n")) {
-                        sender.sendMessage(line.isEmpty() ? " " : line);
-                    }
+                    sendFormatted(statsMessage.toString(), sender);
                 });
             } else {
-                statsMessage.append(" \n");
-
-                for (String line : statsMessage.toString().split("\n")) {
-                    sender.sendMessage(line.isEmpty() ? " " : line);
-                }
+                statsMessage.append(" ");
+                sendFormatted(statsMessage.toString(), sender);
             }
         });
     }
 
+    private void sendFormatted(String raw, CommandSender sender) {
+        for (String line : raw.split("\n")) {
+            sender.sendMessage(line.isEmpty() ? " " : line);
+        }
+    }
+
+    private String formatTime(long millis) {
+        long totalSeconds = millis / 1000;
+        long days = totalSeconds / 86400;
+        long remaining = totalSeconds % 86400;
+
+        long hours = remaining / 3600;
+        remaining %= 3600;
+
+        long minutes = remaining / 60;
+        long seconds = remaining % 60;
+
+        StringBuilder sb = new StringBuilder();
+        if (days > 0) {
+            sb.append(days).append("d ");
+        }
+        if (hours > 0) {
+            sb.append(hours).append("h ");
+        }
+        if (minutes > 0) {
+            sb.append(minutes).append("m ");
+        }
+        if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+            sb.append(seconds).append("s");
+        }
+
+        return sb.toString().trim();
+    }
 
     @Override
     public List<String> tabComplete(@NotNull ColdTracker plugin, @NotNull CommandSender sender, @NotNull String[] args) {

@@ -2,63 +2,77 @@
 prefix: '&8「&#635AA7C&#7D72B7o&#978BC7l&#B2A3D8d&#CCBCE8T&#E6D4F8r&#D8B8F8a&#C99CF7c&#BB80F7k&#AC64F6e&#9E48F6r&8」&7» '
 
 # Help Command
-command-help-description: '&8 - &c/coldtracker help &7- Afișează meniul de ajutor... Ai ajuns'
+command-help-description: '&8 - &c/coldtracker help &7- Afiseaza meniul de ajutor... Ati ajuns'
 command-help-title: '&cComenzi disponibile:'
 
 # Misc
-no-permission: '&cNu ai permisiunea pentru asta!'
-unknown-command: '&cComandă necunoscută &4%input%&c.'
-invalid-command-usage: '&cUtilizare invalidă a comenzii.'
-player-not-found: '&7Jucătorul nu a fost găsit: &c{player}&7.'
+no-permission: '&cNu aveti permisiunea pentru asta!'
+unknown-command: '&cComanda necunoscuta &4%input%&c.'
+invalid-command-usage: '&cUtilizare de comanda invalida.'
+player-not-found: '&7Jucatorul nu a fost gasit: &c{player}&7.'
 
 # Showtime Command Message
-command-showtime-description: '&8 - &c/coldtracker showtime <playername> &7- Afișează timpul total al unui jucător'
-no-staff-member: '&7&c{player} &7nu este un membru al staffului.'
+command-showtime-description: '&8 - &c/coldtracker showtime <numejucator> &7- Afiseaza timpul total urmarit al jucatorului'
+no-staff-member: '&7&c{player} &7nu este membru staff.'
 showtime-message: '&c{player} &7a jucat timp de &c{time}&7.'
-command-showtime-usage: '&7Utilizare: &c/coldtracker showtime <playername>'
+command-showtime-usage: '&7Utilizare: &c/coldtracker showtime <numejucator>'
 
 # ShowVote Command Message
-command-showvotes-description: '&8 - &c/coldtracker showvotes <playername> &7- Afișează totalul de voturi al unui jucător'
-showvotes-message: "&c{player} &7are un total de &c{votes}&7 voturi."
-command-showvotes-disabled: '&7Tracker-ul de voturi este &cdezactivat&7. Consultați fișierul de configurare.'
-command-votes-not-available: '&7Nu a fost detectat niciun plugin de voturi. Tracker-ul de voturi este &cindisponibil&7.'
+command-showvotes-description: '&8 - &c/coldtracker showvotes <numejucator> &7- Afiseaza totalul voturilor urmarite ale jucatorului'
+showvotes-message: '&c{player} &7are un total de &c{votes}&7 voturi.'
+command-showvotes-disabled: '&7Urmarirea voturilor &cdezactivata&7. Consultati fisierul de configurare.'
+command-votes-not-available: '&7Plugin de vot nedetectat. Urmarirea voturilor este &cindisponibila&7.'
 
 # Stats Command
-command-stats-description: '&8 - &c/coldtracker stats &7- Vizualizează statisticile tale personale'
+command-stats-description: '&8 - &c/coldtracker stats &7- Vedeti statisticile personale'
 command-stats-console-no-self: '&7Consola nu poate avea statistici.'
-command-stats-self-title: '&7Statistici personale:'
-command-stats-other-title: '&c{player}&7''s statistici:'
+command-stats-self-title: '&7Statisticile dumneavoastra:'
+command-stats-other-title: '&7Statisticile lui &c{player}&7:'
 command-stats-playtime-prefix: '• &7Timp de joc: &c{time} 🕓'
 command-stats-votes-prefix: '• &7Voturi: &c{votes} 📩'
+command-stats-total-header: '• &7Timp total pe server:'
+command-stats-total-server-line: '   &8- &f{server}&7: &c{time}'
+command-stats-total-combined: '• &7Timp global: &b{time}'
 
 # Database message warnings
-command-wipe-description: '&8 - &c/coldtracker wipe &7- Șterge baza de date SQLite curentă'
+command-wipe-description: '&8 - &c/coldtracker wipe &7- Sterge baza de date SQLite curenta'
 command-wipe-usage: '&7Utilizare: &c/coldtracker wipe'
-command-wipe-warning: '&eATENȚIE: &cAceastă operațiune va șterge toate datele din baza de date activă. &cDacă sunteți absolut sigur, utilizați &a/coldtracker wipe confirm&c.'
-command-wipe-success: '&7Toate datele din baza de date au fost șterse &cîncărcate cu succes&7.'
+command-wipe-warning: '&eATENTIE: &cAceasta operatiune va sterge toate datele din baza de date activa. &cDaca sunteti absolut sigur, folositi &a/coldtracker wipe confirm&c.'
+command-wipe-success: '&7Toate datele din baza de date au fost sterse &cu succes&7.'
 
 # Base Command Message
 base-command-color: '&7'
-base-command-help: '&7Utilizați &c/coldtracker help &7pentru informații despre comenzi.'
+base-command-help: '&7Folositi &c/coldtracker help &7pentru informatii despre comenzi.'
 
 # Reload Command
-command-reload-description: '&8 - &c/coldtracker reload &7- Reîncarcă pluginul'
+command-reload-description: '&8 - &c/coldtracker reload &7- Reincarca plugin-ul'
 command-reload-usage: '&7Utilizare: &c/coldtracker reload'
-command-reload-success: '&7Fișierele de configurare și localizare au fost reîncărcate.'
+command-reload-success: '&7Configuratia si fisierele de localizare au fost reincarcate.'
 
 # Dump Command
-command-dump-disabled: '&7Dump-ul Gist este &cdezactivat&7. Consultați fișierul de configurare.'
-command-dump-description: '&8 - &c/coldtracker dump &7- Exportă datele din baza de date curentă în Gist'
+command-dump-disabled: '&7Dump Gist &cdezactivat&7. Consultati fisierul de configurare.'
+command-dump-description: '&8 - &c/coldtracker dump &7- Exporteaza datele din baza de date curenta in Gist'
 command-dump-usage: '&7Utilizare: &c/coldtracker dump'
-command-dump-warning: '&eATENȚIE: &cAceastă operațiune va exporta datele din baza de date curentă. Utilizați &a/coldtracker dump confirm&c pentru a continua.'
-command-dump-success: '&7Exportul bazei de date a fost &crealizat cu succes&7! Link: &a{link}'
-command-dump-fail: '&cNu s-a putut genera link-ul Gist. Verificați consola pentru mai multe erori.'
+command-dump-warning: '&eATENTIE: &cAceasta operatiune va exporta datele din baza de date curenta. Folositi &a/coldtracker dump confirm&c pentru a continua.'
+command-dump-success: '&7Exportul bazei de date &creusit&7! Link: &a{link}'
+command-dump-fail: '&cEses in generarea link-ului Gist. Verificati consola pentru erori.'
+
+# Server Migration Command
+command-migrate-server-name-description: '&8 - &c/coldtracker migrate-server-name &7- Migreaza inregistrarile de nume de server in baza de date'
+command-migrate-server-name-usage: '&7Utilizare: &c/coldtracker migrate-server-name <nume-vechi> <nume-nou>'
+command-migrate-server-name-same-error: '&cNumele de server vechi si cel nou nu pot fi identice!'
+command-migrate-server-name-start: '&6Incepe migrarea numelui de server de la &c{old} &6la &a{new}&6...'
+command-migrate-server-name-success: '&7Migrare reusita a &a{records} &7inregistrari de la &c{old} &7la &a{new}&7!'
+command-migrate-server-name-no-records: '&cNicio inregistrare gasita cu numele de server &4{old}&c.'
 
 # Export Command
-command-export-description: '&8 - &c/coldtracker export &7- Exportă datele în plugins/ColdTracker'
-command-export-warning: '&eATENȚIE: &cFișierul de export deja există. Utilizați &a/coldtracker export confirm &cpentru a suprascrie.'
-command-export-success: '&7Exportul a fost &crealizat cu succes&7. Datele au fost salvate în &aplugins/ColdTracker/{folder}&7.'
-command-export-fail: '&cNu s-a putut salva export.yml. Verificați consola pentru erori.'
+command-export-description: '&8 - &c/coldtracker export &7- Exporteaza datele in plugins/ColdTracker'
+command-export-warning: '&eATENTIE: &cFisierul de export exista deja. Folositi &a/coldtracker export confirm &cpentru a suprascrie.'
+command-export-success: '&7Export &creusit&7. Datele au fost salvate in &aplugins/ColdTracker/{folder}&7.'
+command-export-fail: '&cEses in salvarea export.yml. Verificati consola pentru erori.'
+command-export-discord-disabled: '&7Exportul webhook Discord este &cdezactivat &7in configurare. Actiune anulata.'
+command-export-discord-success: '&7Export &ctrimis cu succes&7 pe Discord.'
+command-export-discord-fail: '&cEses &7in trimiterea exportului pe Discord.'
 
 # Version Command
-command-version-description: '&8 - &c/coldtracker version &7- Afișează informațiile despre versiunea ColdTracker'
+command-version-description: '&8 - &c/coldtracker version &7- Afiseaza informatiile de versiune pentru ColdTracker'
