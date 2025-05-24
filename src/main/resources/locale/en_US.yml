@@ -19,7 +19,7 @@ command-showtime-usage: '&7Usage: &c/coldtracker showtime <playername>'
 
 # ShowVote Command Message
 command-showvotes-description: '&8 - &c/coldtracker showvotes <playername> &7- Show player''s total votes tracked'
-showvotes-message: '&c{player} &7has a total of &c{votes}&7 votes.'
+showvotes-message: "&c{player} &7has a total of &c{votes}&7 votes."
 command-showvotes-disabled: '&7Vote tracker &cdisabled&7. Please consult configuration file.'
 command-votes-not-available: '&7Voting plugin not detected. Vote tracking is &cunavailable&7.'
 
@@ -30,9 +30,6 @@ command-stats-self-title: '&7Your stats:'
 command-stats-other-title: '&c{player}''s &7stats:'
 command-stats-playtime-prefix: '• &7Playtime: &c{time} 🕓'
 command-stats-votes-prefix: '• &7Votes: &c{votes} 📩'
-command-stats-total-header: '• &7Total time per server:'
-command-stats-total-server-line: '   &8- &f{server}&7: &c{time}'
-command-stats-total-combined: '• &7Overall time: &b{time}'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Wipe current SQLite database'
@@ -57,22 +54,11 @@ command-dump-warning: '&eWARNING: &cThis operation will dump the data from the c
 command-dump-success: '&7Database dump &asuccessful&7! Link: &a{link}'
 command-dump-fail: '&cFailed to generate Gist link. Check console for any errors.'
 
-# Server Migration Command
-command-migrate-server-name-description: '&8 - &c/coldtracker migrate-server-name &7- Migrate server name records in database'
-command-migrate-server-name-usage: '&7Usage: &c/coldtracker migrate-server-name <old-name> <new-name>'
-command-migrate-server-name-same-error: '&cOld and new server names cannot be the same!'
-command-migrate-server-name-start: '&6Starting server name migration from &c{old} &6to &a{new}&6...'
-command-migrate-server-name-success: '&7Successfully migrated &a{records} &7records from &c{old} &7to &a{new}&7!'
-command-migrate-server-name-no-records: '&cNo records found with server name &4{old}&c.'
-
 # Export Command
 command-export-description: '&8 - &c/coldtracker export &7- Exports the data to plugins/ColdTracker'
 command-export-warning: '&eWARNING: &cExport file already exists. Use &a/coldtracker export confirm &cto overwrite.'
 command-export-success: '&7Export &asuccessful&7. The data has been saved to &aplugins/ColdTracker/{folder}&7.'
 command-export-fail: '&cFailed to save export.yml. Check the console for errors.'
-command-export-discord-disabled: '&7Discord webhook export is &cdisabled &7in the config. Action cancelled.'
-command-export-discord-success: '&7Export &asuccessfully &7sent to Discord.'
-command-export-discord-fail: '&cFailed &7to send export to Discord.'
 
 # Version Command
 command-version-description: '&8 - &c/coldtracker version &7- Display the version info for ColdTracker'

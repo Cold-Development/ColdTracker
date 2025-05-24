@@ -79,8 +79,8 @@ public class DumpCommand extends BaseCommand {
             for (OfflinePlayer player : playersWithPermission) {
                 UUID playerUUID = player.getUniqueId();
 
-                CompletableFuture<Long> timeFuture = plugin.getStorageHandler().getTotalTimeAsync(playerUUID);
-                CompletableFuture<Integer> votesFuture = plugin.getStorageHandler().getTotalVotesAsync(playerUUID);
+                CompletableFuture<Long> timeFuture = plugin.getDatabaseManager().getTotalTimeAsync(playerUUID);
+                CompletableFuture<Integer> votesFuture = plugin.getDatabaseManager().getTotalVotesAsync(playerUUID);
 
                 CompletableFuture<String> playerDataFuture = CompletableFuture.allOf(timeFuture, votesFuture).thenApply(v -> {
                     long totalTime = timeFuture.join();

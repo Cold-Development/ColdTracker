@@ -26,7 +26,6 @@ public class Commander extends CommandHandler {
         this.registerCommand(new DumpCommand());
         this.registerCommand(new ExportCommand());
         this.registerCommand(new ShowVotesCommand());
-        this.registerCommand(new MigrateServerNameCommand());
         this.registerCommand(new StatsCommand());
 
     }

@@ -33,7 +33,7 @@ public class WipeCommand extends BaseCommand {
             return;
         }
 
-        plugin.getStorageHandler().wipeDatabaseTables();
+        plugin.getDatabaseManager().wipeDatabaseTables();
         localeManager.sendMessage(sender, "command-wipe-success");
     }
 

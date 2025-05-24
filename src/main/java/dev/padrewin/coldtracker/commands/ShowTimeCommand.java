@@ -60,7 +60,7 @@ public class ShowTimeCommand extends BaseCommand {
                     return;
                 }
 
-                plugin.getStorageHandler().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
+                plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
                     long totalSeconds = totalTime / 1000;
 
                     long days = totalSeconds / 86400;

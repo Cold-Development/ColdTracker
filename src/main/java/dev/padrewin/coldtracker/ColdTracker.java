@@ -2,33 +2,31 @@ package dev.padrewin.coldtracker;
 
 import dev.padrewin.colddev.ColdPlugin;
 import dev.padrewin.colddev.config.ColdSetting;
+import dev.padrewin.colddev.database.DatabaseConnector;
+import dev.padrewin.colddev.database.SQLiteConnector;
 import dev.padrewin.colddev.manager.Manager;
 import dev.padrewin.colddev.manager.PluginUpdateManager;
-import dev.padrewin.coldtracker.database.MySQLStorageHandler;
-import dev.padrewin.coldtracker.database.SQLiteStorageHandler;
-import dev.padrewin.coldtracker.database.StorageHandler;
+import dev.padrewin.coldtracker.database.DatabaseManager;
 import dev.padrewin.coldtracker.listeners.PlayerTrackingListener;
 import dev.padrewin.coldtracker.listeners.StaffVoteListener;
 import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.manager.LocaleManager;
-import dev.padrewin.coldtracker.rotation.RotationScheduler;
 import dev.padrewin.coldtracker.setting.SettingKey;
-import dev.padrewin.coldtracker.util.ServerNameResolver;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import static dev.padrewin.colddev.manager.AbstractDataManager.*;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import static dev.padrewin.colddev.manager.AbstractDataManager.ANSI_BOLD;
-import static dev.padrewin.colddev.manager.AbstractDataManager.ANSI_LIGHT_BLUE;
 
 public final class ColdTracker extends ColdPlugin {
 
+    /**
+     * Console colors
+     */
     String ANSI_RESET = "\u001B[0m";
     String ANSI_CHINESE_PURPLE = "\u001B[38;5;93m";
     String ANSI_PURPLE = "\u001B[35m";
@@ -42,12 +40,12 @@ public final class ColdTracker extends ColdPlugin {
     private LuckPerms luckPerms;
     private boolean votifierAvailable;
     private final Map<UUID, Long> joinTimes = new HashMap<>();
-    private StorageHandler storageHandler;
 
     public ColdTracker() {
         super("Cold-Development", "ColdTracker", 23682, null, LocaleManager.class, null);
         instance = this;
     }
+    private DatabaseManager databaseManager;
 
     @Override
     public void enable() {
@@ -56,19 +54,20 @@ public final class ColdTracker extends ColdPlugin {
         setupLuckPerms();
         setupVotifier();
 
-        setupStorageHandler();
+        // Initialize DatabaseManager
+        databaseManager = new DatabaseManager(this, "coldtracker.db");
+        DatabaseConnector connector;
+        connector = new SQLiteConnector(this);
+        String databasePath = connector.getDatabasePath();
+        getLogger().info(ANSI_GREEN + "Database path: " + ANSI_YELLOW + databasePath + ANSI_RESET);
 
-        if (storageHandler != null) {
-            storageHandler.cleanupStaleSessions();
-            storageHandler.startBatchUpdater();
-        } else {
-            getLogger().severe("StorageHandler is null! Check setupStorageHandler()");
-        }
+        // Cleanup last join sessions
+        databaseManager.cleanupStaleSessions();
 
-        new RotationScheduler(this).start();
-
+        // Initialize time tracking event listener
         getServer().getPluginManager().registerEvents(new PlayerTrackingListener(this), this);
 
+        // Initialize vote tracking event listener
         if (votifierAvailable) {
             getServer().getPluginManager().registerEvents(new StaffVoteListener(this), this);
         }
@@ -87,6 +86,7 @@ public final class ColdTracker extends ColdPlugin {
         getLogger().info(ANSI_AQUA + "    (c) Cold Development ❄" + ANSI_RESET);
         getLogger().info("");
 
+
         File configFile = new File(getDataFolder(), "en_US.yml");
         if (!configFile.exists()) {
             saveDefaultConfig();
@@ -97,103 +97,50 @@ public final class ColdTracker extends ColdPlugin {
 
     @Override
     public void disable() {
-        boolean debug = getConfig().getBoolean("debug", false);
+        getLogger().info("[DEBUG] Processing remaining playtime before shutdown...");
 
-        if (debug) {
-            getLogger().info("[DEBUG] Processing remaining playtime before shutdown...");
-        }
+        if (databaseManager != null) {
+            List<CompletableFuture<Void>> tasks = new ArrayList<>();
 
-        List<CompletableFuture<Void>> tasks = new ArrayList<>();
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("coldtracker.tracktime")) {
-                CompletableFuture<Void> task = storageHandler.removeJoinTimeAsync(player.getUniqueId())
-                        .exceptionally(ex -> {
-                            getLogger().severe("[ERROR] Failed to remove join time for " + player.getName() + ": " + ex.getMessage());
-                            return null;
-                        });
-                tasks.add(task);
+            if (!Bukkit.getOnlinePlayers().isEmpty()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.hasPermission("coldtracker.tracktime")) {
+                        CompletableFuture<Void> task = databaseManager.removeJoinTimeAsync(player.getUniqueId())
+                                .exceptionally(ex -> {
+                                    getLogger().severe("[ERROR] Failed to remove join time for " + player.getName() + ": " + ex.getMessage());
+                                    return null;
+                                });
+                        tasks.add(task);
+                    }
+                }
             }
-        }
 
-        // Wait for all tasks to complete with a timeout
-        CompletableFuture<Void> allTasks = CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0]));
-
-        try {
-            allTasks.get(10, TimeUnit.SECONDS); // Wait max 10 seconds
-        } catch (Exception e) {
-            if (debug) {
-                getLogger().warning("[DEBUG] Timeout or error waiting for playtime processing: " + e.getMessage());
-            }
-        }
-
-        // Always close the storage handler
-        if (storageHandler != null) {
-            storageHandler.closeConnection();
-            if (debug) {
-                getLogger().info("[DEBUG] Database connection closed successfully.");
-            }
-        }
-
-        getLogger().info("");
-        getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
-        getLogger().info("");
-    }
-
-
-    public void setupStorageHandler() {
-        boolean debug = getConfig().getBoolean("debug", false);
-
-        // Properly close existing storage handler if it exists
-        if (this.storageHandler != null) {
-            if (debug) {
-                getLogger().info("Switching storage handlers - closing current connection...");
-            }
-            this.storageHandler.closeConnection(); // This now stops batch updater too
-            this.storageHandler = null;
-        }
-
-        String type = SettingKey.STORAGE_TYPE.get().toLowerCase();
-        if (type.equals("mysql")) {
-            this.storageHandler = new MySQLStorageHandler(this);
-            if (debug) {
-                getLogger().info("Using MySQL as data storage.");
+            if (!tasks.isEmpty()) {
+                CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).thenRun(() -> {
+                    databaseManager.closeConnection();
+                    getLogger().info("");
+                    getLogger().info("[DEBUG] Database connection closed successfully.");
+                    getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
+                    getLogger().info("");
+                });
+            } else {
+                databaseManager.closeConnection();
+                getLogger().info("");
+                getLogger().info("[DEBUG] No active players to process, database closed immediately.");
+                getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
+                getLogger().info("");
             }
         } else {
-            this.storageHandler = new SQLiteStorageHandler(this);
-            if (debug) {
-                getLogger().info("Using SQLite as data storage.");
-            }
-        }
-
-        // Start the batch updater for the new storage handler
-        if (this.storageHandler != null) {
-            this.storageHandler.startBatchUpdater();
-            if (debug) {
-                getLogger().info("Storage handler initialized and batch updater started.");
-            }
+            getLogger().info("");
+            getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
+            getLogger().info("");
         }
     }
 
-    public StorageHandler getStorageHandler() {
-        return storageHandler;
-    }
 
     @Override
     public void reload() {
         super.reload();
-
-        // Clear cached server name so it gets re-resolved with new config
-        ServerNameResolver.clearCache();
-
-        // Check if storage type changed and reinitialize if needed
-        String currentType = storageHandler instanceof MySQLStorageHandler ? "mysql" : "sqlite";
-        String configType = SettingKey.STORAGE_TYPE.get().toLowerCase();
-
-        if (!currentType.equals(configType)) {
-            getLogger().info("[ColdTracker] Storage type changed from " + currentType + " to " + configType + " - reinitializing...");
-            setupStorageHandler();
-        }
     }
 
     public Map<UUID, Long> getJoinTimes() {
@@ -232,6 +179,10 @@ public final class ColdTracker extends ColdPlugin {
         return instance;
     }
 
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
+    }
+
     public LuckPerms getLuckPerms() {
         return luckPerms;
     }
@@ -261,4 +212,5 @@ public final class ColdTracker extends ColdPlugin {
             getLogger().warning(ANSI_LIGHT_BLUE + "No voting plugin found (nuvotifier). Vote-related features will be disabled. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
         }
     }
+
 }

@@ -74,7 +74,7 @@ public class StaffVoteListener implements Listener {
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                plugin.getStorageHandler().addVote(
+                plugin.getDatabaseManager().addVote(
                         playerUUID,
                         username,
                         serviceName,
