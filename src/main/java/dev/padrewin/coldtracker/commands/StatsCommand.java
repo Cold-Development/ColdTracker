@@ -1,6 +1,7 @@
 package dev.padrewin.coldtracker.commands;
 
 import dev.padrewin.coldtracker.ColdTracker;
+import dev.padrewin.coldtracker.listeners.PlayerTrackingListener;
 import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.manager.LocaleManager;
 import org.bukkit.Bukkit;
@@ -74,71 +75,82 @@ public class StatsCommand extends BaseCommand {
     private void showStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName, boolean isSelf) {
         String prefix = localeManager.getLocaleMessage("prefix");
 
-        plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
-            long totalSeconds = totalTime / 1000;
+        // Try to get real-time data first, fallback to database
+        PlayerTrackingListener trackingListener = plugin.getPlayerTrackingListener();
+        if (trackingListener != null && trackingListener.hasRealtimeData(playerUUID)) {
+            // Use real-time data
+            long totalTime = trackingListener.getRealtimeTotalTime(playerUUID);
+            displayStats(plugin, localeManager, sender, playerUUID, playerName, totalTime, isSelf);
+        } else {
+            // Fallback to database query
+            plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
+                displayStats(plugin, localeManager, sender, playerUUID, playerName, totalTime, isSelf);
+            });
+        }
+    }
 
-            long days = totalSeconds / 86400;
-            long remaining = totalSeconds % 86400;
+    private void displayStats(ColdTracker plugin, LocaleManager localeManager, CommandSender sender, UUID playerUUID, String playerName, long totalTime, boolean isSelf) {
+        String prefix = localeManager.getLocaleMessage("prefix");
 
-            long hours = remaining / 3600;
-            remaining %= 3600;
+        long totalSeconds = totalTime / 1000;
+        long days = totalSeconds / 86400;
+        long remaining = totalSeconds % 86400;
+        long hours = remaining / 3600;
+        remaining %= 3600;
+        long minutes = remaining / 60;
+        long seconds = remaining % 60;
 
-            long minutes = remaining / 60;
-            long seconds = remaining % 60;
+        StringBuilder sb = new StringBuilder();
+        if (days > 0) {
+            sb.append(days).append("d ");
+        }
+        if (hours > 0) {
+            sb.append(hours).append("h ");
+        }
+        if (minutes > 0) {
+            sb.append(minutes).append("m ");
+        }
+        if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+            sb.append(seconds).append("s");
+        }
 
-            StringBuilder sb = new StringBuilder();
-            if (days > 0) {
-                sb.append(days).append("d ");
-            }
-            if (hours > 0) {
-                sb.append(hours).append("h ");
-            }
-            if (minutes > 0) {
-                sb.append(minutes).append("m ");
-            }
-            if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
-                sb.append(seconds).append("s");
-            }
+        String timeFormatted = sb.toString().trim();
 
-            String timeFormatted = sb.toString().trim();
+        StringBuilder statsMessage = new StringBuilder();
+        statsMessage.append(" \n");
 
-            StringBuilder statsMessage = new StringBuilder();
-            statsMessage.append(" \n");
-
-            if (isSelf) {
-                statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-self-title")).append("\n");
-            } else {
-                statsMessage.append(prefix).append(
-                        localeManager.getLocaleMessage("command-stats-other-title").replace("{player}", playerName)
-                ).append("\n");
-            }
-
+        if (isSelf) {
+            statsMessage.append(prefix).append(localeManager.getLocaleMessage("command-stats-self-title")).append("\n");
+        } else {
             statsMessage.append(prefix).append(
-                    localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)
+                    localeManager.getLocaleMessage("command-stats-other-title").replace("{player}", playerName)
             ).append("\n");
+        }
 
-            if (plugin.getConfig().getBoolean("track-votes", false)) {
-                plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
-                    statsMessage.append(prefix).append(
-                            localeManager.getLocaleMessage("command-stats-votes-prefix")
-                                    .replace("{votes}", String.valueOf(totalVotes))
-                    ).append("\n");
-                    statsMessage.append(" \n");
+        statsMessage.append(prefix).append(
+                localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)
+        ).append("\n");
 
-                    for (String line : statsMessage.toString().split("\n")) {
-                        sender.sendMessage(line.isEmpty() ? " " : line);
-                    }
-                });
-            } else {
+        if (plugin.getConfig().getBoolean("track-votes", false)) {
+            plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
+                statsMessage.append(prefix).append(
+                        localeManager.getLocaleMessage("command-stats-votes-prefix")
+                                .replace("{votes}", String.valueOf(totalVotes))
+                ).append("\n");
                 statsMessage.append(" \n");
 
                 for (String line : statsMessage.toString().split("\n")) {
                     sender.sendMessage(line.isEmpty() ? " " : line);
                 }
-            }
-        });
-    }
+            });
+        } else {
+            statsMessage.append(" \n");
 
+            for (String line : statsMessage.toString().split("\n")) {
+                sender.sendMessage(line.isEmpty() ? " " : line);
+            }
+        }
+    }
 
     @Override
     public List<String> tabComplete(@NotNull ColdTracker plugin, @NotNull CommandSender sender, @NotNull String[] args) {

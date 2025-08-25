@@ -11,6 +11,7 @@ import dev.padrewin.coldtracker.listeners.PlayerTrackingListener;
 import dev.padrewin.coldtracker.listeners.StaffVoteListener;
 import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.manager.LocaleManager;
+import dev.padrewin.coldtracker.manager.FlexibleSchedulerManager;
 import dev.padrewin.coldtracker.setting.SettingKey;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
@@ -40,12 +41,13 @@ public final class ColdTracker extends ColdPlugin {
     private LuckPerms luckPerms;
     private boolean votifierAvailable;
     private final Map<UUID, Long> joinTimes = new HashMap<>();
+    private DatabaseManager databaseManager;
+    private PlayerTrackingListener playerTrackingListener;
 
     public ColdTracker() {
         super("Cold-Development", "ColdTracker", 23682, null, LocaleManager.class, null);
         instance = this;
     }
-    private DatabaseManager databaseManager;
 
     @Override
     public void enable() {
@@ -64,8 +66,9 @@ public final class ColdTracker extends ColdPlugin {
         // Cleanup last join sessions
         databaseManager.cleanupStaleSessions();
 
-        // Initialize time tracking event listener
-        getServer().getPluginManager().registerEvents(new PlayerTrackingListener(this), this);
+        // Initialize unified player tracking listener (handles both events and real-time tracking)
+        playerTrackingListener = new PlayerTrackingListener(this);
+        getServer().getPluginManager().registerEvents(playerTrackingListener, this);
 
         // Initialize vote tracking event listener
         if (votifierAvailable) {
@@ -86,7 +89,6 @@ public final class ColdTracker extends ColdPlugin {
         getLogger().info(ANSI_AQUA + "    (c) Cold Development ❄" + ANSI_RESET);
         getLogger().info("");
 
-
         File configFile = new File(getDataFolder(), "en_US.yml");
         if (!configFile.exists()) {
             saveDefaultConfig();
@@ -97,7 +99,7 @@ public final class ColdTracker extends ColdPlugin {
 
     @Override
     public void disable() {
-        getLogger().info("[DEBUG] Processing remaining playtime before shutdown...");
+        debugLog("Processing remaining playtime before shutdown...");
 
         if (databaseManager != null) {
             List<CompletableFuture<Void>> tasks = new ArrayList<>();
@@ -117,26 +119,37 @@ public final class ColdTracker extends ColdPlugin {
 
             if (!tasks.isEmpty()) {
                 CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).thenRun(() -> {
+                    // Only shutdown tracking listener AFTER database operations complete
+                    if (playerTrackingListener != null) {
+                        playerTrackingListener.shutdown();
+                    }
+
                     databaseManager.closeConnection();
-                    getLogger().info("");
-                    getLogger().info("[DEBUG] Database connection closed successfully.");
+                    debugLog("Database connection closed successfully.");
                     getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
                     getLogger().info("");
                 });
             } else {
+                // No active players, safe to shutdown immediately
+                if (playerTrackingListener != null) {
+                    playerTrackingListener.shutdown();
+                }
+
                 databaseManager.closeConnection();
-                getLogger().info("");
-                getLogger().info("[DEBUG] No active players to process, database closed immediately.");
+                debugLog("No active players to process, database closed immediately.");
                 getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
                 getLogger().info("");
             }
         } else {
+            // No database manager, just cleanup listener
+            if (playerTrackingListener != null) {
+                playerTrackingListener.shutdown();
+            }
             getLogger().info("");
             getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
             getLogger().info("");
         }
     }
-
 
     @Override
     public void reload() {
@@ -150,7 +163,8 @@ public final class ColdTracker extends ColdPlugin {
     @Override
     protected List<Class<? extends Manager>> getManagerLoadPriority() {
         return List.of(
-                CommandManager.class
+                CommandManager.class,
+                FlexibleSchedulerManager.class
         );
     }
 
@@ -187,6 +201,10 @@ public final class ColdTracker extends ColdPlugin {
         return luckPerms;
     }
 
+    public PlayerTrackingListener getPlayerTrackingListener() {
+        return playerTrackingListener;
+    }
+
     private void setupLuckPerms() {
         RegisteredServiceProvider<LuckPerms> provider = getServer().getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {
@@ -200,6 +218,26 @@ public final class ColdTracker extends ColdPlugin {
 
     public boolean isVotifierAvailable() {
         return votifierAvailable;
+    }
+
+    /**
+     * Logs debug messages only if debug mode is enabled
+     * @param message The message to log
+     */
+    public void debugLog(String message) {
+        if (SettingKey.DEBUG.get()) {
+            getLogger().info("[DEBUG] " + message);
+        }
+    }
+
+    /**
+     * Logs warning messages only if debug mode is enabled
+     * @param message The message to log
+     */
+    public void debugWarn(String message) {
+        if (SettingKey.DEBUG.get()) {
+            getLogger().warning("[DEBUG] " + message);
+        }
     }
 
     private void setupVotifier() {

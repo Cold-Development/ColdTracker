@@ -1,6 +1,7 @@
 package dev.padrewin.coldtracker.commands;
 
 import dev.padrewin.coldtracker.ColdTracker;
+import dev.padrewin.coldtracker.listeners.PlayerTrackingListener;
 import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.manager.LocaleManager;
 import net.luckperms.api.model.user.User;
@@ -60,15 +61,17 @@ public class ShowTimeCommand extends BaseCommand {
                     return;
                 }
 
-                plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
-                    long totalSeconds = totalTime / 1000;
+                // Try to get real-time data first, fallback to database
+                PlayerTrackingListener trackingListener = plugin.getPlayerTrackingListener();
+                if (trackingListener != null && trackingListener.hasRealtimeData(playerUUID)) {
+                    // Use real-time data (includes current session)
+                    long totalTime = trackingListener.getRealtimeTotalTime(playerUUID);
 
+                    long totalSeconds = totalTime / 1000;
                     long days = totalSeconds / 86400;
                     long remaining = totalSeconds % 86400;
-
                     long hours = remaining / 3600;
                     remaining %= 3600;
-
                     long minutes = remaining / 60;
                     long seconds = remaining % 60;
 
@@ -87,13 +90,45 @@ public class ShowTimeCommand extends BaseCommand {
                     }
 
                     String timeFormatted = sb.toString().trim();
-
                     String prefix = localeManager.getLocaleMessage("prefix");
                     String message = prefix + localeManager.getLocaleMessage("showtime-message")
                             .replace("{player}", targetPlayer.getName() != null ? targetPlayer.getName() : playerName)
                             .replace("{time}", timeFormatted);
+
                     sender.sendMessage(message);
-                });
+                } else {
+                    // Fallback to database query
+                    plugin.getDatabaseManager().getTotalTimeAsync(playerUUID).thenAccept(totalTime -> {
+                        long totalSeconds = totalTime / 1000;
+                        long days = totalSeconds / 86400;
+                        long remaining = totalSeconds % 86400;
+                        long hours = remaining / 3600;
+                        remaining %= 3600;
+                        long minutes = remaining / 60;
+                        long seconds = remaining % 60;
+
+                        StringBuilder sb = new StringBuilder();
+                        if (days > 0) {
+                            sb.append(days).append("d ");
+                        }
+                        if (hours > 0) {
+                            sb.append(hours).append("h ");
+                        }
+                        if (minutes > 0) {
+                            sb.append(minutes).append("m ");
+                        }
+                        if (seconds > 0 || (days == 0 && hours == 0 && minutes == 0)) {
+                            sb.append(seconds).append("s");
+                        }
+
+                        String timeFormatted = sb.toString().trim();
+                        String prefix = localeManager.getLocaleMessage("prefix");
+                        String message = prefix + localeManager.getLocaleMessage("showtime-message")
+                                .replace("{player}", targetPlayer.getName() != null ? targetPlayer.getName() : playerName)
+                                .replace("{time}", timeFormatted);
+                        sender.sendMessage(message);
+                    });
+                }
             } else {
                 sender.sendMessage(localeManager.getLocaleMessage("player-not-found").replace("{player}", playerName));
             }

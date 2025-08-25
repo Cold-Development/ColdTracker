@@ -12,7 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class StaffVoteListener implements Listener {
 
@@ -24,53 +23,92 @@ public class StaffVoteListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVote(VotifierEvent event) {
-        Vote vote = event.getVote();
-        String username = vote.getUsername();
+        final Vote vote = event.getVote();
+        final String username = vote.getUsername();
 
-        if (username == null || username.trim().isEmpty()) {
-            if (plugin.getConfig().getBoolean("debug", false)) {
-                plugin.getLogger().warning("[DEBUG] Received a vote with no username.");
+        if (username == null) {
+            debugWarn("Received a vote with no username.");
+            return;
+        }
+
+        final String name = username.trim();
+        if (name.isEmpty() || !name.matches("^[A-Za-z0-9_]{3,16}$")) {
+            debugInfo("Ignoring vote with invalid username: " + name);
+            return;
+        }
+
+
+        Player online = Bukkit.getPlayerExact(name);
+        if (online != null) {
+            if (online.hasPermission("coldtracker.trackvote")) {
+                logVote(online.getUniqueId(), online.getName(), vote);
+            } else {
+                debugInfo("Vote from " + name + " ignored (online but no staff perm).");
             }
             return;
         }
 
-        Player player = Bukkit.getPlayerExact(username);
-        if (player != null && player.hasPermission("coldtracker.trackvote")) {
-            logVote(player.getUniqueId(), player.getName(), vote);
-            return;
-        }
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(username);
 
-            if (!offlinePlayer.hasPlayedBefore()) {
-                if (plugin.getConfig().getBoolean("debug", false)) {
-                    plugin.getLogger().info("[DEBUG] Offline player " + username + " has never played on this server.");
+
+            UUID cachedUuid = null;
+            try {
+                OfflinePlayer cached = Bukkit.getOfflinePlayerIfCached(name); // Paper API
+                if (cached != null) {
+                    cachedUuid = cached.getUniqueId();
                 }
+            } catch (NoSuchMethodError ignored) {
+
+            }
+
+            if (cachedUuid != null) {
+                handleUuidPermissionAndLog(cachedUuid, name, vote);
                 return;
             }
 
-            CompletableFuture<User> userFuture = plugin.getLuckPerms().getUserManager().loadUser(offlinePlayer.getUniqueId());
-            userFuture.thenAccept(user -> {
-                if (user != null && user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
-                    logVote(offlinePlayer.getUniqueId(), username, vote);
-                } else {
-                    if (plugin.getConfig().getBoolean("debug", false)) {
-                        plugin.getLogger().info("[DEBUG] Vote from " + username + " ignored (not staff or no permission).");
-                    }
+
+            plugin.getLuckPerms().getUserManager().lookupUniqueId(name).thenAccept(uuid -> {
+                if (uuid == null) {
+                    debugInfo("Ignoring vote from " + name + " (no cache, no LP match).");
+                    return;
                 }
+                handleUuidPermissionAndLog(uuid, name, vote);
+            }).exceptionally(ex -> {
+                plugin.getLogger().severe("[ERROR] LuckPerms lookupUniqueId failed for " + name + ": " + ex.getMessage());
+                return null;
             });
         });
     }
 
-    private void logVote(UUID playerUUID, String username, Vote vote) {
-        String serviceName = vote.getServiceName();
-        String timestamp = vote.getTimeStamp();
+    private void handleUuidPermissionAndLog(UUID uuid, String suggestedName, Vote vote) {
+        plugin.getLuckPerms().getUserManager().loadUser(uuid).thenAccept(user -> {
+            if (user == null) {
+                debugInfo("LP loadUser returned null for " + suggestedName + " (" + uuid + ")");
+                return;
+            }
 
-        // Debug log
-        if (plugin.getConfig().getBoolean("debug", false)) {
-            plugin.getLogger().info("[DEBUG] Logging vote for " + username + " from service " + serviceName + " at " + timestamp);
-        }
+            boolean isStaff = user.getCachedData().getPermissionData()
+                    .checkPermission("coldtracker.trackvote").asBoolean();
+
+            if (!isStaff) {
+                debugInfo("Vote from " + suggestedName + " ignored (no staff perm).");
+                return;
+            }
+
+            String resolvedName = user.getUsername() != null ? user.getUsername() : suggestedName;
+            logVote(uuid, resolvedName, vote);
+        }).exceptionally(ex -> {
+            plugin.getLogger().severe("[ERROR] LuckPerms loadUser failed for " + suggestedName + " (" + uuid + "): " + ex.getMessage());
+            return null;
+        });
+    }
+
+    private void logVote(UUID playerUUID, String username, Vote vote) {
+        String serviceName = vote.getServiceName() != null ? vote.getServiceName() : "unknown";
+        String timestamp = vote.getTimeStamp() != null ? vote.getTimeStamp() : String.valueOf(System.currentTimeMillis());
+
+        debugInfo("Logging vote for " + username + " from service " + serviceName + " at " + timestamp);
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
@@ -86,4 +124,15 @@ public class StaffVoteListener implements Listener {
         });
     }
 
+    private void debugInfo(String msg) {
+        if (plugin.getConfig().getBoolean("debug", false)) {
+            plugin.getLogger().info("[DEBUG] " + msg);
+        }
+    }
+
+    private void debugWarn(String msg) {
+        if (plugin.getConfig().getBoolean("debug", false)) {
+            plugin.getLogger().warning("[DEBUG] " + msg);
+        }
+    }
 }
