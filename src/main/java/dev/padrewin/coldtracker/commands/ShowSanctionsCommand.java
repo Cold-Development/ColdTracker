@@ -10,6 +10,7 @@ import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -37,7 +38,7 @@ public class ShowSanctionsCommand extends BaseCommand {
             return;
         }
 
-        if (!sender.hasPermission("coldtracker.showsanctions")) {
+        if (!sender.hasPermission("coldtracker.stats.others")) {
             localeManager.sendMessage(sender, "no-permission");
             return;
         }
@@ -121,5 +122,10 @@ public class ShowSanctionsCommand extends BaseCommand {
             return null;
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean hasPermission(Permissible permissible) {
+        return permissible.hasPermission("coldtracker.stats.others");
     }
 }

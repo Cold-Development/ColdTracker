@@ -21,7 +21,7 @@ commands:
   showvotes:
     permission: "coldtracker.showvotes"
   showsanctions:
-    permission: "coldtracker.showsanctions"
+    permission: "coldtracker.stats.others"
   stats:
     permission: "coldtracker.stats"
 
@@ -36,7 +36,6 @@ permissions:
       coldtracker.dump: true
       coldtracker.export: true
       coldtracker.showvotes: true
-      coldtracker.showsanctions: true
       coldtracker.stats: true
       coldtracker.stats.others: true
 
@@ -72,14 +71,10 @@ permissions:
     description: Gives access to the showvotes command
     default: op
 
-  coldtracker.showsanctions:
-    description: Gives access to the showsanctions command
-    default: op
-
   coldtracker.stats:
     description: Gives access to the stats command
     default: op
 
   coldtracker.stats.others:
-    description: Gives access to view stats of other staff members
+    description: Gives access to view stats (playtime/votes/sanctions) of other staff members
     default: op

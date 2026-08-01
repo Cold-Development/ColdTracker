@@ -142,7 +142,8 @@ public class StatsCommand extends BaseCommand {
             ));
         }
 
-        if (plugin.getConfig().getBoolean(SettingKey.TRACK_SANCTIONS.getKey(), false)
+        if (!isSelf && sender.hasPermission("coldtracker.stats.others")
+                && plugin.getConfig().getBoolean(SettingKey.TRACK_SANCTIONS.getKey(), false)
                 && plugin.getLiteBansHook() != null && plugin.getLiteBansHook().isAvailable()) {
             extraBlocks.add(plugin.getDatabaseManager().getSanctionsPeriodStartAsync()
                     .thenCompose(periodStart -> plugin.getLiteBansHook().getSanctionCountsAsync(playerUUID, periodStart))
