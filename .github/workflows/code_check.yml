@@ -36,7 +36,7 @@ jobs:
 
       # Step 4: Run Maven clean and compile
       - name: Compile Code
-        run: mvn clean compile
+        run: mvn clean compile -U
 
       # Step 5: Run Maven tests
       - name: Run Tests
