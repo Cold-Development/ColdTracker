@@ -40,7 +40,7 @@ public class StaffVoteListener implements Listener {
 
         Player online = Bukkit.getPlayerExact(name);
         if (online != null) {
-            if (online.hasPermission("coldtracker.trackvote")) {
+            if (online.hasPermission("coldtracker.tracktime")) {
                 logVote(online.getUniqueId(), online.getName(), vote);
             } else {
                 debugInfo("Vote from " + name + " ignored (online but no staff perm).");
@@ -89,7 +89,7 @@ public class StaffVoteListener implements Listener {
             }
 
             boolean isStaff = user.getCachedData().getPermissionData()
-                    .checkPermission("coldtracker.trackvote").asBoolean();
+                    .checkPermission("coldtracker.tracktime").asBoolean();
 
             if (!isStaff) {
                 debugInfo("Vote from " + suggestedName + " ignored (no staff perm).");
@@ -110,18 +110,16 @@ public class StaffVoteListener implements Listener {
 
         debugInfo("Logging vote for " + username + " from service " + serviceName + " at " + timestamp);
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                plugin.getDatabaseManager().addVote(
-                        playerUUID,
-                        username,
-                        serviceName,
-                        timestamp
-                );
-            } catch (Exception e) {
-                plugin.getLogger().severe("[ERROR] Failed to log vote for " + username + ": " + e.getMessage());
-            }
-        });
+        try {
+            plugin.getDatabaseManager().addVote(
+                    playerUUID,
+                    username,
+                    serviceName,
+                    timestamp
+            );
+        } catch (Exception e) {
+            plugin.getLogger().severe("[ERROR] Failed to log vote for " + username + ": " + e.getMessage());
+        }
     }
 
     private void debugInfo(String msg) {

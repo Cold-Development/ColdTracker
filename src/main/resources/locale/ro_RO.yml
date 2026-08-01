@@ -23,6 +23,12 @@ showvotes-message: "&c{player} &7are un total de &c{votes}&7 voturi."
 command-showvotes-disabled: '&7Tracker-ul de voturi este &cdezactivat&7. Consultați fișierul de configurare.'
 command-votes-not-available: '&7Nu a fost detectat niciun plugin de voturi. Tracker-ul de voturi este &cindisponibil&7.'
 
+# ShowSanctions Command Message
+command-showsanctions-description: '&8 - &c/coldtracker showsanctions <playername> &7- Afișează totalul de sancțiuni date de un jucător'
+command-showsanctions-title: '&c{player}&7''s sancțiuni:'
+command-showsanctions-disabled: '&7Tracker-ul de sancțiuni este &cdezactivat&7. Consultați fișierul de configurare.'
+command-sanctions-not-available: '&7Nu a fost detectat pluginul LiteBans. Tracker-ul de sancțiuni este &cindisponibil&7.'
+
 # Stats Command
 command-stats-description: '&8 - &c/coldtracker stats &7- Vizualizează statisticile tale personale'
 command-stats-console-no-self: '&7Consola nu poate avea statistici.'
@@ -30,6 +36,11 @@ command-stats-self-title: '&7Statistici personale:'
 command-stats-other-title: '&c{player}&7''s statistici:'
 command-stats-playtime-prefix: '• &7Timp de joc: &c{time} 🕓'
 command-stats-votes-prefix: '• &7Voturi: &c{votes} 📩'
+command-stats-sanctions-title: '• &7Sancțiuni (&c{total}&7): ⚖'
+command-stats-sanctions-mute: '  &8- &7Mute: &c{count}'
+command-stats-sanctions-ban: '  &8- &7Ban: &c{count}'
+command-stats-sanctions-kick: '  &8- &7Kick: &c{count}'
+command-stats-sanctions-warn: '  &8- &7Warn: &c{count}'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Șterge baza de date SQLite curentă'

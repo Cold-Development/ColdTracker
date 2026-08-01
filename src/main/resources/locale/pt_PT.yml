@@ -23,6 +23,12 @@ showvotes-message: "&c{player} &7tem um total de &c{votes}&7 votos."
 command-showvotes-disabled: '&7O rastreamento de votos está &cdesativado&7. Consulte o arquivo de configuração.'
 command-votes-not-available: '&7Nenhum plugin de votos detectado. O rastreamento de votos está &cindisponível&7.'
 
+# ShowSanctions Command Message
+command-showsanctions-description: '&8 - &c/coldtracker showsanctions <playername> &7- Mostra o total de sanções aplicadas por um jogador'
+command-showsanctions-title: '&c{player}&7''s sanções:'
+command-showsanctions-disabled: '&7O rastreamento de sanções está &cdesativado&7. Consulte o arquivo de configuração.'
+command-sanctions-not-available: '&7Plugin LiteBans não detectado. O rastreamento de sanções está &cindisponível&7.'
+
 # Stats Command
 command-stats-description: '&8 - &c/coldtracker stats &7- Veja suas estatísticas pessoais'
 command-stats-console-no-self: '&7O console não pode ter estatísticas.'
@@ -30,6 +36,11 @@ command-stats-self-title: '&7Suas estatísticas:'
 command-stats-other-title: '&c{player}&7''s estatísticas:'
 command-stats-playtime-prefix: '• &7Tempo de Jogo: &c{time} 🕓'
 command-stats-votes-prefix: '• &7Votos: &c{votes} 📩'
+command-stats-sanctions-title: '• &7Sanções (&c{total}&7): ⚖'
+command-stats-sanctions-mute: '  &8- &7Mute: &c{count}'
+command-stats-sanctions-ban: '  &8- &7Ban: &c{count}'
+command-stats-sanctions-kick: '  &8- &7Kick: &c{count}'
+command-stats-sanctions-warn: '  &8- &7Warn: &c{count}'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- Apaga o banco de dados SQLite atual'

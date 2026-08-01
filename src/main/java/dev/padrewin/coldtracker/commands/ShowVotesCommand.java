@@ -61,7 +61,7 @@ public class ShowVotesCommand extends BaseCommand {
         CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
         userFuture.thenAccept(user -> {
             if (user != null) {
-                boolean hasPermission = user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean();
+                boolean hasPermission = user.getCachedData().getPermissionData().checkPermission("coldtracker.tracktime").asBoolean();
                 if (!hasPermission) {
                     String prefix = localeManager.getLocaleMessage("prefix");
                     String message = prefix + localeManager.getLocaleMessage("no-staff-member").replace("{player}", playerName);

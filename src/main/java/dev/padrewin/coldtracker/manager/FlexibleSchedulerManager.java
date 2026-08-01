@@ -3,6 +3,7 @@ package dev.padrewin.coldtracker.manager;
 import dev.padrewin.colddev.ColdPlugin;
 import dev.padrewin.colddev.manager.Manager;
 import dev.padrewin.coldtracker.ColdTracker;
+import dev.padrewin.coldtracker.commands.ExportCommand;
 import dev.padrewin.coldtracker.discord.DiscordWebhookClient;
 import dev.padrewin.coldtracker.setting.SettingKey;
 import org.bukkit.Bukkit;
@@ -207,48 +208,8 @@ public class FlexibleSchedulerManager extends Manager {
             // Execute export command to generate the export file
             executeExportCommand();
 
-            // Check if the export file exists
-            String folderName = SettingKey.FOLDER_NAME.get();
-            File folder = new File(plugin.getDataFolder(), folderName);
-
-            if (!folder.exists()) {
-                plugin.getLogger().severe("Export folder does not exist: " + folder.getPath());
-                return;
-            }
-
-            // Find the export file using the same format as ExportCommand
-            LocalDateTime exportTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm");
-            String formattedDateTime = exportTime.format(formatter);
-            String prefix = SettingKey.FILE_PREFIX.get();
-
-            File exportFile = new File(folder, prefix + formattedDateTime + ".yml");
-
-            // Se așteaptă puțin pentru a permite comenzii să termine de scris fișierul
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            if (!exportFile.exists()) {
-                // Poate fișierul a fost creat cu un alt nume, așa că căutăm cel mai recent fișier
-                File[] files = folder.listFiles();
-                if (files == null || files.length == 0) {
-                    plugin.getLogger().severe("No export files found in folder: " + folder.getPath());
-                    return;
-                }
-
-                // Get the most recent file
-                exportFile = null;
-                long lastModified = 0;
-                for (File file : files) {
-                    if (file.isFile() && file.lastModified() > lastModified) {
-                        lastModified = file.lastModified();
-                        exportFile = file;
-                    }
-                }
-            }
+            ExportCommand.ExportResult exportResult = ExportCommand.getLastExportResultFuture().getNow(null);
+            File exportFile = exportResult != null ? exportResult.getFile() : null;
 
             if (exportFile == null || !exportFile.exists()) {
                 plugin.getLogger().severe("Could not find export file after running export command");
@@ -276,6 +237,11 @@ public class FlexibleSchedulerManager extends Manager {
 
                 // Wipe database if configured
                 if (SettingKey.AUTO_WIPE_AFTER_SEND.get()) {
+                    if (!isExportSafeForWipe(exportResult)) {
+                        plugin.getLogger().severe("Safety check failed: export is incomplete or invalid. Database wipe skipped.");
+                        return;
+                    }
+
                     plugin.getDatabaseManager().wipeDatabaseTables();
 
                     // Also clear real-time cache since database was wiped
@@ -299,8 +265,23 @@ public class FlexibleSchedulerManager extends Manager {
         }
     }
 
+    private boolean isExportSafeForWipe(ExportCommand.ExportResult exportResult) {
+        if (exportResult == null) {
+            return false;
+        }
+        File file = exportResult.getFile();
+        if (file == null || !file.exists() || file.length() <= 0) {
+            return false;
+        }
+        if (exportResult.hadWriteErrors()) {
+            return false;
+        }
+        return !(exportResult.getExportedStaffCount() <= 0 &&
+                (exportResult.getExportedTotalTimeMs() > 0 || exportResult.getExportedTotalVotes() > 0));
+    }
+
     private void executeExportCommand() {
-        CompletableFuture<Void> future = new CompletableFuture<>();
+        CompletableFuture<Void> commandFuture = new CompletableFuture<>();
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             try {
@@ -314,27 +295,34 @@ public class FlexibleSchedulerManager extends Manager {
                         if (SettingKey.DEBUG.get()) {
                             plugin.getLogger().info("[DEBUG] Successfully executed export command");
                         }
-                        future.complete(null);
+                        commandFuture.complete(null);
                     } else {
                         plugin.getLogger().warning("Export command execution returned false");
-                        future.completeExceptionally(new RuntimeException("Command execution failed"));
+                        commandFuture.completeExceptionally(new RuntimeException("Command execution failed"));
                     }
                 } else {
                     plugin.getLogger().severe("Could not find coldtracker command!");
-                    future.completeExceptionally(new RuntimeException("Command not found"));
+                    commandFuture.completeExceptionally(new RuntimeException("Command not found"));
                 }
             } catch (Exception e) {
                 plugin.getLogger().severe("Error executing export command: " + e.getMessage());
-                future.completeExceptionally(e);
+                commandFuture.completeExceptionally(e);
             }
         });
 
         try {
-            // Wait for the command to complete with a timeout
-            future.get(30, TimeUnit.SECONDS);
+            // Wait for command dispatch to complete.
+            commandFuture.get(30, TimeUnit.SECONDS);
 
-            // Wait an additional moment for the file to be fully written
-            Thread.sleep(2000);
+            // The export command itself runs asynchronously; wait for actual export completion.
+            CompletableFuture<File> exportFuture = ExportCommand.getLastExportFuture();
+            if (exportFuture != null) {
+                exportFuture.get(5, TimeUnit.MINUTES);
+            }
+            CompletableFuture<ExportCommand.ExportResult> resultFuture = ExportCommand.getLastExportResultFuture();
+            if (resultFuture != null) {
+                resultFuture.get(5, TimeUnit.MINUTES);
+            }
         } catch (Exception e) {
             plugin.getLogger().severe("Timeout or error waiting for export command to complete: " + e.getMessage());
         }

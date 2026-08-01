@@ -4,7 +4,7 @@ main: dev.padrewin.coldtracker.ColdTracker
 api-version: '1.13'
 authors: [ padrewin ]
 depend: [LuckPerms]
-softdepend: [Votifier]
+softdepend: [Votifier, LiteBans]
 
 commands:
   coldtracker:
@@ -20,6 +20,8 @@ commands:
     permission: "coldtracker.dump"
   showvotes:
     permission: "coldtracker.showvotes"
+  showsanctions:
+    permission: "coldtracker.showsanctions"
   stats:
     permission: "coldtracker.stats"
 
@@ -34,6 +36,7 @@ permissions:
       coldtracker.dump: true
       coldtracker.export: true
       coldtracker.showvotes: true
+      coldtracker.showsanctions: true
       coldtracker.stats: true
       coldtracker.stats.others: true
 
@@ -58,7 +61,7 @@ permissions:
     default: op
 
   coldtracker.tracktime:
-    description: Gives access to track the time
+    description: Gives access to be tracked by ColdTracker (time, votes and sanctions)
     default: op
 
   coldtracker.export:
@@ -69,8 +72,8 @@ permissions:
     description: Gives access to the showvotes command
     default: op
 
-  coldtracker.trackvote:
-    description: Gives access to track the votes
+  coldtracker.showsanctions:
+    description: Gives access to the showsanctions command
     default: op
 
   coldtracker.stats:

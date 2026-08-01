@@ -23,6 +23,12 @@ showvotes-message: "&c{player} &7的总投票数为 &c{votes}&7。"
 command-showvotes-disabled: '&7投票追踪已被 &c禁用&7。请检查配置文件。'
 command-votes-not-available: '&7未检测到投票插件。投票追踪 &c不可用&7。'
 
+# ShowSanctions Command Message
+command-showsanctions-description: '&8 - &c/coldtracker showsanctions <playername> &7- 显示玩家的总处罚数'
+command-showsanctions-title: '&c{player}&7 的处罚：'
+command-showsanctions-disabled: '&7处罚追踪已被 &c禁用&7。请检查配置文件。'
+command-sanctions-not-available: '&7未检测到 LiteBans 插件。处罚追踪 &c不可用&7。'
+
 # Stats Command
 command-stats-description: '&8 - &c/coldtracker stats &7- 查看你的个人统计数据'
 command-stats-console-no-self: '&7控制台无法拥有统计数据。'
@@ -30,6 +36,11 @@ command-stats-self-title: '&7你的统计：'
 command-stats-other-title: '&c{player}&7 的统计：'
 command-stats-playtime-prefix: '• &7游戏时间：&c{time} 🕓'
 command-stats-votes-prefix: '• &7投票数：&c{votes} 📩'
+command-stats-sanctions-title: '• &7处罚 (&c{total}&7)： ⚖'
+command-stats-sanctions-mute: '  &8- &7禁言：&c{count}'
+command-stats-sanctions-ban: '  &8- &7封禁：&c{count}'
+command-stats-sanctions-kick: '  &8- &7踢出：&c{count}'
+command-stats-sanctions-warn: '  &8- &7警告：&c{count}'
 
 # Database message warnings
 command-wipe-description: '&8 - &c/coldtracker wipe &7- 清除当前SQLite数据库'

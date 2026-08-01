@@ -1,6 +1,7 @@
 package dev.padrewin.coldtracker.commands;
 
 import dev.padrewin.coldtracker.ColdTracker;
+import dev.padrewin.coldtracker.integration.SanctionCounts;
 import dev.padrewin.coldtracker.manager.LocaleManager;
 import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.gist.GitHubGistClient;
@@ -53,6 +54,9 @@ public class DumpCommand extends BaseCommand {
         }
 
         CompletableFuture.runAsync(() -> {
+            plugin.getDatabaseManager().flushActiveSessionsAsync().join();
+            plugin.getDatabaseManager().waitForPendingVoteWritesAsync().join();
+
             List<OfflinePlayer> playersWithPermission = Arrays.stream(Bukkit.getOfflinePlayers())
                     .filter(p -> {
                         CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(p.getUniqueId());
@@ -72,7 +76,10 @@ public class DumpCommand extends BaseCommand {
 
             gistContent.append("\n");
 
-            boolean trackVotes = plugin.getConfig().getBoolean("track-votes", false);
+            boolean trackVotes = plugin.getConfig().getBoolean(SettingKey.TRACK_VOTES.getKey(), false);
+            boolean trackSanctions = plugin.getConfig().getBoolean(SettingKey.TRACK_SANCTIONS.getKey(), false)
+                    && plugin.getLiteBansHook() != null && plugin.getLiteBansHook().isAvailable();
+            long sanctionsPeriodStart = trackSanctions ? plugin.getDatabaseManager().getSanctionsPeriodStartAsync().join() : 0L;
 
             List<CompletableFuture<String>> futures = new ArrayList<>();
 
@@ -81,10 +88,14 @@ public class DumpCommand extends BaseCommand {
 
                 CompletableFuture<Long> timeFuture = plugin.getDatabaseManager().getTotalTimeAsync(playerUUID);
                 CompletableFuture<Integer> votesFuture = plugin.getDatabaseManager().getTotalVotesAsync(playerUUID);
+                CompletableFuture<SanctionCounts> sanctionsFuture = trackSanctions
+                        ? plugin.getLiteBansHook().getSanctionCountsAsync(playerUUID, sanctionsPeriodStart)
+                        : CompletableFuture.completedFuture(SanctionCounts.EMPTY);
 
-                CompletableFuture<String> playerDataFuture = CompletableFuture.allOf(timeFuture, votesFuture).thenApply(v -> {
+                CompletableFuture<String> playerDataFuture = CompletableFuture.allOf(timeFuture, votesFuture, sanctionsFuture).thenApply(v -> {
                     long totalTime = timeFuture.join();
                     int totalVotes = votesFuture.join();
+                    SanctionCounts sanctionCounts = sanctionsFuture.join();
 
                     long totalSeconds = totalTime / 1000;
 
@@ -117,12 +128,19 @@ public class DumpCommand extends BaseCommand {
                     playerData.append(player.getName()).append(" has played for ").append(timeFormatted);
 
                     if (trackVotes) {
-                        CompletableFuture<User> userFuture = luckPerms.getUserManager().loadUser(playerUUID);
-                        if (userFuture.join().getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean()) {
-                            playerData.append(" and has ")
-                                    .append(totalVotes)
-                                    .append(" votes");
-                        }
+                        playerData.append(" and has ")
+                                .append(totalVotes)
+                                .append(" votes");
+                    }
+
+                    if (trackSanctions) {
+                        playerData.append(" and has issued ")
+                                .append(sanctionCounts.total())
+                                .append(" sanctions (Mute: ").append(sanctionCounts.mutes())
+                                .append(", Ban: ").append(sanctionCounts.bans())
+                                .append(", Kick: ").append(sanctionCounts.kicks())
+                                .append(", Warn: ").append(sanctionCounts.warnings())
+                                .append(")");
                     }
 
                     playerData.append(".\n");

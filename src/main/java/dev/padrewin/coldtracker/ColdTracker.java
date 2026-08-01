@@ -7,6 +7,7 @@ import dev.padrewin.colddev.database.SQLiteConnector;
 import dev.padrewin.colddev.manager.Manager;
 import dev.padrewin.colddev.manager.PluginUpdateManager;
 import dev.padrewin.coldtracker.database.DatabaseManager;
+import dev.padrewin.coldtracker.integration.LiteBansHook;
 import dev.padrewin.coldtracker.listeners.PlayerTrackingListener;
 import dev.padrewin.coldtracker.listeners.StaffVoteListener;
 import dev.padrewin.coldtracker.manager.CommandManager;
@@ -43,6 +44,7 @@ public final class ColdTracker extends ColdPlugin {
     private final Map<UUID, Long> joinTimes = new HashMap<>();
     private DatabaseManager databaseManager;
     private PlayerTrackingListener playerTrackingListener;
+    private LiteBansHook liteBansHook;
 
     public ColdTracker() {
         super("Cold-Development", "ColdTracker", 23682, null, LocaleManager.class, null);
@@ -55,6 +57,7 @@ public final class ColdTracker extends ColdPlugin {
 
         setupLuckPerms();
         setupVotifier();
+        setupLiteBans();
 
         // Initialize DatabaseManager
         databaseManager = new DatabaseManager(this, "coldtracker.db");
@@ -101,6 +104,10 @@ public final class ColdTracker extends ColdPlugin {
     public void disable() {
         debugLog("Processing remaining playtime before shutdown...");
 
+        if (liteBansHook != null) {
+            liteBansHook.shutdown();
+        }
+
         if (databaseManager != null) {
             List<CompletableFuture<Void>> tasks = new ArrayList<>();
 
@@ -118,17 +125,16 @@ public final class ColdTracker extends ColdPlugin {
             }
 
             if (!tasks.isEmpty()) {
-                CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).thenRun(() -> {
-                    // Only shutdown tracking listener AFTER database operations complete
-                    if (playerTrackingListener != null) {
-                        playerTrackingListener.shutdown();
-                    }
+                CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).join();
 
-                    databaseManager.closeConnection();
-                    debugLog("Database connection closed successfully.");
-                    getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
-                    getLogger().info("");
-                });
+                if (playerTrackingListener != null) {
+                    playerTrackingListener.shutdown();
+                }
+
+                databaseManager.closeConnection();
+                debugLog("Database connection closed successfully.");
+                getLogger().info(ANSI_CHINESE_PURPLE + "ColdTracker disabled." + ANSI_RESET);
+                getLogger().info("");
             } else {
                 // No active players, safe to shutdown immediately
                 if (playerTrackingListener != null) {
@@ -205,6 +211,10 @@ public final class ColdTracker extends ColdPlugin {
         return playerTrackingListener;
     }
 
+    public LiteBansHook getLiteBansHook() {
+        return liteBansHook;
+    }
+
     private void setupLuckPerms() {
         RegisteredServiceProvider<LuckPerms> provider = getServer().getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {
@@ -248,6 +258,15 @@ public final class ColdTracker extends ColdPlugin {
         } else {
             votifierAvailable = false;
             getLogger().warning(ANSI_LIGHT_BLUE + "No voting plugin found (nuvotifier). Vote-related features will be disabled. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
+        }
+    }
+
+    private void setupLiteBans() {
+        liteBansHook = new LiteBansHook(this);
+        if (liteBansHook.isAvailable()) {
+            getLogger().info(ANSI_LIGHT_BLUE + "LiteBans API loaded successfully. " + ANSI_BOLD + ANSI_GREEN + "✔" + ANSI_RESET);
+        } else {
+            getLogger().warning(ANSI_LIGHT_BLUE + "LiteBans not found. Sanction tracking will be disabled. " + ANSI_BOLD + ANSI_RED + "✘" + ANSI_RESET);
         }
     }
 

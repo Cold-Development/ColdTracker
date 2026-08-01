@@ -47,6 +47,13 @@ public class SettingKey {
             "If set to true, the plugin will track votes and include them in exports/dumps.",
             "If set to false, votes will be ignored.");
 
+    public static final ColdSetting<Boolean> TRACK_SANCTIONS = create("track-sanctions", BOOLEAN, false,
+            "Enable or disable tracking of staff sanctions (mutes, bans, kicks, warnings).",
+            "This feature requires the LiteBans plugin to be installed.",
+            "Plugin: https://www.spigotmc.org/resources/litebans.3715/",
+            "If set to true, the plugin will read sanction counts from LiteBans and include them in stats/exports/dumps.",
+            "If set to false, sanctions will be ignored.");
+
     public static final ColdSetting<String> FOLDER_NAME = create("folder-name", STRING, "exported-database",
             "The name of the folder where exported files will be saved.",
             "If left blank, it will default to 'exported database'.");

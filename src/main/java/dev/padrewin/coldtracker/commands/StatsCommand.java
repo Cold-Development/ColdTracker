@@ -4,15 +4,18 @@ import dev.padrewin.coldtracker.ColdTracker;
 import dev.padrewin.coldtracker.listeners.PlayerTrackingListener;
 import dev.padrewin.coldtracker.manager.CommandManager;
 import dev.padrewin.coldtracker.manager.LocaleManager;
+import dev.padrewin.coldtracker.setting.SettingKey;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class StatsCommand extends BaseCommand {
 
@@ -55,9 +58,8 @@ public class StatsCommand extends BaseCommand {
                     }
 
                     boolean trackTime = user.getCachedData().getPermissionData().checkPermission("coldtracker.tracktime").asBoolean();
-                    boolean trackVotes = user.getCachedData().getPermissionData().checkPermission("coldtracker.trackvote").asBoolean();
 
-                    if (!trackTime && !trackVotes) {
+                    if (!trackTime) {
                         sender.sendMessage(prefix + localeManager.getLocaleMessage("no-staff-member").replace("{player}", targetName));
                         return;
                     }
@@ -131,25 +133,36 @@ public class StatsCommand extends BaseCommand {
                 localeManager.getLocaleMessage("command-stats-playtime-prefix").replace("{time}", timeFormatted)
         ).append("\n");
 
-        if (plugin.getConfig().getBoolean("track-votes", false)) {
-            plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenAccept(totalVotes -> {
-                statsMessage.append(prefix).append(
-                        localeManager.getLocaleMessage("command-stats-votes-prefix")
-                                .replace("{votes}", String.valueOf(totalVotes))
-                ).append("\n");
-                statsMessage.append(" \n");
+        List<CompletableFuture<String>> extraBlocks = new ArrayList<>();
 
-                for (String line : statsMessage.toString().split("\n")) {
-                    sender.sendMessage(line.isEmpty() ? " " : line);
-                }
-            });
-        } else {
+        if (plugin.getConfig().getBoolean(SettingKey.TRACK_VOTES.getKey(), false)) {
+            extraBlocks.add(plugin.getDatabaseManager().getTotalVotesAsync(playerUUID).thenApply(totalVotes ->
+                    prefix + localeManager.getLocaleMessage("command-stats-votes-prefix")
+                            .replace("{votes}", String.valueOf(totalVotes)) + "\n"
+            ));
+        }
+
+        if (plugin.getConfig().getBoolean(SettingKey.TRACK_SANCTIONS.getKey(), false)
+                && plugin.getLiteBansHook() != null && plugin.getLiteBansHook().isAvailable()) {
+            extraBlocks.add(plugin.getDatabaseManager().getSanctionsPeriodStartAsync()
+                    .thenCompose(periodStart -> plugin.getLiteBansHook().getSanctionCountsAsync(playerUUID, periodStart))
+                    .thenApply(counts -> {
+                        StringBuilder block = new StringBuilder();
+                        ShowSanctionsCommand.appendSanctionsBlock(block, localeManager, prefix, counts);
+                        return block.toString();
+                    }));
+        }
+
+        CompletableFuture.allOf(extraBlocks.toArray(new CompletableFuture[0])).thenRun(() -> {
+            for (CompletableFuture<String> block : extraBlocks) {
+                statsMessage.append(block.join());
+            }
             statsMessage.append(" \n");
 
             for (String line : statsMessage.toString().split("\n")) {
                 sender.sendMessage(line.isEmpty() ? " " : line);
             }
-        }
+        });
     }
 
     @Override
